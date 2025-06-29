@@ -33,8 +33,6 @@ export default function () {
   const arr = Array.from({ length: ARRAY_SIZE }, (_, i) => i);
   measure.setConfig({ ARRAY_SIZE });
 
-  console.log(`数组长度：${arr.length}\n`);
-
   measure.run('for', () => {
     for (let i = 0; i < arr.length; i++) {
       const x = arr[i] * 2;

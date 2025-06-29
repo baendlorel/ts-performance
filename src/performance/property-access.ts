@@ -18,8 +18,8 @@ import { createMeasure } from '@/core';
  */
 const measure = createMeasure('Property Access');
 export default function () {
-  const RUN_TIME = 10000_0000;
-  const OBJ_SIZE = 100000;
+  const RUN_TIME = 1e6;
+  const OBJ_SIZE = 1000;
   measure.setConfig({ RUN_TIME, OBJ_SIZE });
 
   const obj = { a: 1, b: 2, c: 3 } as any;

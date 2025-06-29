@@ -20,7 +20,7 @@ import { createMeasure } from '@/core';
  */
 const measure = createMeasure('Property detection');
 export default function () {
-  const RUN_TIME = 1e7;
+  const RUN_TIME = 1e8;
   const OBJ_SIZE = 10;
   measure.setConfig({ RUN_TIME, OBJ_SIZE });
 
@@ -34,8 +34,6 @@ export default function () {
   });
 
   measure.run('Reflect.has', () => {
-    for (let i = 0; i < 1e7; i++) {
-      Reflect.has(obj, 'a');
-    }
+    Reflect.has(obj, 'a');
   });
 }

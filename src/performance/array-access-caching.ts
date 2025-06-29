@@ -16,7 +16,7 @@ import { createMeasure } from '@/core';
  */
 const measure = createMeasure('Array Access');
 export default function () {
-  const ARRAY_SIZE = 100000000;
+  const ARRAY_SIZE = 1000000;
   const arr = Array.from({ length: ARRAY_SIZE }, (_, i) => i);
   measure.setConfig({ ARRAY_SIZE });
 

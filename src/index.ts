@@ -5,25 +5,26 @@
 
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { displayResults } from './core';
 
-/**
- * 运行所有性能测试
- */
 async function runAllTests() {
-  console.log('=== TypeScript 性能测试 ===');
+  console.log('=== TypeScript Performance Test ===');
+  console.log();
 
   const performanceDir = join(process.cwd(), 'src', 'performance');
   const files = readdirSync(performanceDir);
+  console.time('Running');
   for (const f of files) {
     const func = await import(join(performanceDir, f));
     if (typeof func === 'object' && func.default) {
-      console.log();
-      console.log(`🔄 ${func.meta.name}测试`);
-      await func.default();
+      func.default();
     }
+    console.timeLog('Running', f);
   }
+  console.timeEnd('Running');
+  displayResults();
 
   console.log();
-  console.log('✅ 所有测试完成');
+  console.log('✅ All tests completed successfully!');
 }
 runAllTests();
