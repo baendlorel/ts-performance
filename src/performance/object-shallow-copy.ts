@@ -24,7 +24,7 @@ import { createMeasure } from '@/core';
  * - Object.assign: 2.889s
  * - Reflect.get/set/ownKeys: 2.625s
  */
-const measure = createMeasure('Object Iteration');
+const measure = createMeasure('Object Shallow Copy');
 export default function () {
   const chars = '_-+=#@&$ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const randStr = (length: number) => {

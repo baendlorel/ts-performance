@@ -27,7 +27,7 @@ import { createMeasure } from '@/core';
  * - reduce              : 54.98ms
  * - Array.from + forEach: 50.18ms
  */
-const measure = createMeasure('Array Access');
+const measure = createMeasure('Array Loops');
 export default function () {
   const ARRAY_SIZE = 10_000_000;
   const arr = Array.from({ length: ARRAY_SIZE }, (_, i) => i);
