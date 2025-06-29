@@ -47,9 +47,11 @@ class Measure {
     Object.assign(this.config, config);
     const list = Object.entries(this.config)
       .filter(([key]) => key !== 'RUN_TIME')
-      .map(([key, value]) => `${key}: ${chalk.green(formatNum(value))}`);
+      .map(([key, value]) => `${key}: ${chalk.cyanBright(formatNum(value))}`);
     list.unshift(
-      `${chalk.blueBright('RUN_TIME')}: ${chalk.green(formatNum(this.config.RUN_TIME))}`
+      `${chalk.blueBright('RUN_TIME')}: ${chalk.cyanBright(
+        formatNum(this.config.RUN_TIME)
+      )}`
     );
     this.configAsLabel = list.join(', ');
   }
@@ -70,11 +72,33 @@ class Measure {
 
 export const createMeasure = (testName: string) => new Measure(testName);
 
+const getRatioColor = (ratio: number): [number, number, number] => {
+  const ln = Math.log(ratio);
+  const clampedLn = Math.max(0, Math.min(10, ln));
+  const MID = 1.6;
+
+  if (clampedLn <= MID) {
+    // 0~5: 绿到黄 (绿色减少，红色增加)
+    const t = clampedLn / MID;
+    const r = Math.round(255 * t);
+    const g = 255;
+    const b = 0;
+    return [r, g, b];
+  } else {
+    // 5~10: 黄到红 (绿色减少)
+    const t = (clampedLn - MID) / MID;
+    const r = 255;
+    const g = Math.max(0, Math.round(255 * (1 - t)));
+    const b = 0;
+    return [r, g, b];
+  }
+};
+
 const SPACE = ' '.repeat(4);
 export const displayResults = () => {
-  console.log(`\n=== ${Object.keys(results).length} Results ===`);
+  console.log();
+  console.log(`=== ${Object.keys(results).length} Results ===`);
   console.log(`Time unit: ms`);
-  // console.log(Object.keys(results).length);
   for (const [testName, configToGroup] of Object.entries(results)) {
     console.log(chalk.bold.underline(testName));
     for (const [configStr, group] of Object.entries(configToGroup)) {
@@ -92,11 +116,12 @@ export const displayResults = () => {
         const padLabel = label.padEnd(maxLabelLen + 1, ' ');
         const padTime = time.toFixed(3).padEnd(maxTimeLen + 1, ' ');
         const ratio = (time / least).toFixed(2);
+        const color = chalk.rgb(...getRatioColor(time / least));
         const msg =
           i === 0
             ? chalk.yellowBright(`${padLabel}: ${padTime}`)
             : `${padLabel}: ${chalk.gray(padTime)}`;
-        console.log(SPACE.repeat(2), msg, chalk.magenta(`${ratio}x`));
+        console.log(SPACE.repeat(2), msg, color(`${ratio}x`));
       }
     }
     console.log();
