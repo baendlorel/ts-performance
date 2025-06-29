@@ -1,3 +1,5 @@
+import { createMeasure } from '@/core';
+
 /**
  * 对象遍历性能测试
  * 测试不同方式遍历对象属性的性能差异
@@ -32,16 +34,14 @@
  * - Reflect.ownKeys + for: 1.233s
  * - map.foreach: 32.209ms
  */
-
-export const meta = {
-  name: '对象遍历性能',
-};
-
+const measure = createMeasure('Object Iteration');
 export default function () {
-  const ITERATIONS = 1_000;
+  const RUN_TIME = 1_000;
   const OBJ_SIZE = 100;
   const obj: Record<string, number> = {};
   const map = new Map<string, number>();
+
+  measure.setConfig({ RUN_TIME, OBJ_SIZE });
 
   // 构造大对象
   for (let i = 0; i < OBJ_SIZE; i++) {
@@ -49,49 +49,39 @@ export default function () {
     map.set('key' + i, i);
   }
 
-  console.time('for...in + hasOwnProperty');
-  for (let i = 0; i < ITERATIONS; i++) {
+  measure.run('for...in + hasOwnProperty', () => {
     for (const key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
         const val = obj[key];
       }
     }
-  }
-  console.timeEnd('for...in + hasOwnProperty');
+  });
 
-  console.time('Object.keys + for');
-  for (let i = 0; i < ITERATIONS; i++) {
+  measure.run('for...in + hasOwnProperty', () => {
     const keys = Object.keys(obj);
     for (let j = 0; j < keys.length; j++) {
       const val = obj[keys[j]];
     }
-  }
-  console.timeEnd('Object.keys + for');
+  });
 
-  console.time('Object.entries + for');
-  for (let i = 0; i < ITERATIONS; i++) {
+  measure.run('Object.entries + for', () => {
     const entries = Object.entries(obj);
     for (let j = 0; j < entries.length; j++) {
       const [key, val] = entries[j];
     }
-  }
-  console.timeEnd('Object.entries + for');
+  });
 
-  console.time('Reflect.ownKeys + for');
-  for (let i = 0; i < ITERATIONS; i++) {
+  measure.run('Reflect.ownKeys + for', () => {
     const keys = Reflect.ownKeys(obj);
     for (let j = 0; j < keys.length; j++) {
       const val = (obj as any)[keys[j]];
     }
-  }
-  console.timeEnd('Reflect.ownKeys + for');
+  });
 
-  console.time('map.foreach');
-  for (let i = 0; i < ITERATIONS; i++) {
+  measure.run('map.foreach', () => {
     map.forEach((v, k) => {
       const val = v; // 这里可以使用 k 或 v
       const key = k;
     });
-  }
-  console.timeEnd('map.foreach');
+  });
 }

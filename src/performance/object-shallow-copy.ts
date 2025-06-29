@@ -1,3 +1,4 @@
+import { createMeasure } from '@/core';
 /**
  * 对象浅拷贝性能测试
  * 测试不同方式进行对象浅拷贝的性能差异
@@ -23,14 +24,9 @@
  * - Object.assign: 2.889s
  * - Reflect.get/set/ownKeys: 2.625s
  */
-
-export const meta = {
-  name: '对象浅拷贝性能',
-};
-
+const measure = createMeasure('Object Iteration');
 export default function () {
   const chars = '_-+=#@&$ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
   const randStr = (length: number) => {
     let result = '';
     for (let i = 0; i < length; i++) {
@@ -39,52 +35,40 @@ export default function () {
     return result;
   };
 
-  const TIMES = [1000];
-  const FIELD_COUNT = [10000];
-  const FILED_LEN = [20];
+  const RUN_TIME = 1;
+  const FIELD_COUNT = 100000;
+  const FILED_LEN = 200;
 
-  const run = (TIMES: number, FIELD_COUNT: number, FILED_LEN: number) => {
-    const array = [] as any[];
+  measure.setConfig({ RUN_TIME, FIELD_COUNT, FILED_LEN });
 
-    console.log('TIMES', TIMES, 'FIELD_COUNT', FIELD_COUNT, 'FILED_LEN', FILED_LEN);
-    for (let i = 0; i < TIMES; i++) {
-      array[i] = {};
-      for (let j = 0; j < FIELD_COUNT; j++) {
-        array[i][randStr(FILED_LEN)] = Math.random();
-      }
+  const o = {} as any;
+
+  for (let j = 0; j < FIELD_COUNT; j++) {
+    o[randStr(FILED_LEN)] = Math.random();
+  }
+
+  measure.run('{...obj}', () => {
+    for (let i = 0; i < o.length; i++) {
+      const a = { ...o[i] };
     }
+  });
 
-    console.time('...展开符');
-    for (let i = 0; i < array.length; i++) {
-      const a = { ...array[i] };
+  measure.run('Object.assign', () => {
+    for (let i = 0; i < o.length; i++) {
+      const a = Object.assign({}, o[i]);
     }
-    console.timeEnd('...展开符');
+  });
 
-    console.time('Object.assign');
-    for (let i = 0; i < array.length; i++) {
-      const a = Object.assign({}, array[i]);
-    }
-    console.timeEnd('Object.assign');
-
-    const g = Reflect.get;
-    const s = Reflect.set;
-    const ok = Reflect.ownKeys;
-    console.time('Reflect.get/set/ownKeys');
-    for (let i = 0; i < array.length; i++) {
-      const keys = ok(array[i]);
+  const g = Reflect.get;
+  const s = Reflect.set;
+  const ok = Reflect.ownKeys;
+  measure.run('Reflect.get/set/ownKeys', () => {
+    for (let i = 0; i < o.length; i++) {
+      const keys = ok(o[i]);
       const a = {};
       for (let j = 0; j < keys.length; j++) {
-        s(a, keys[j], g(array[i], keys[j]));
+        s(a, keys[j], g(o[i], keys[j]));
       }
     }
-    console.timeEnd('Reflect.get/set/ownKeys');
-  };
-
-  for (const T of TIMES) {
-    for (const FC of FIELD_COUNT) {
-      for (const FL of FILED_LEN) {
-        run(T, FC, FL);
-      }
-    }
-  }
+  });
 }

@@ -1,3 +1,4 @@
+import { createMeasure } from '@/core';
 /**
  * 数组循环性能测试
  * 测试不同循环方式的性能差异
@@ -26,44 +27,33 @@
  * - reduce              : 54.98ms
  * - Array.from + forEach: 50.18ms
  */
-
-export const meta = {
-  name: '数组循环性能',
-};
-
+const measure = createMeasure('Array Access');
 export default function () {
-  const iterations = 10_000_000;
-  const arr = Array.from({ length: iterations }, (_, i) => i);
-
-  // 工具函数
-  function measure(label: string, fn: Function) {
-    const start = performance.now();
-    fn();
-    const end = performance.now();
-    console.log(`${label.padEnd(20)}: ${(end - start).toFixed(2)}ms`);
-  }
+  const ARRAY_SIZE = 10_000_000;
+  const arr = Array.from({ length: ARRAY_SIZE }, (_, i) => i);
+  measure.setConfig({ ARRAY_SIZE });
 
   console.log(`数组长度：${arr.length}\n`);
 
-  measure('for', () => {
+  measure.run('for', () => {
     for (let i = 0; i < arr.length; i++) {
       const x = arr[i] * 2;
     }
   });
 
-  measure('for...of', () => {
+  measure.run('for...of', () => {
     for (const val of arr) {
       const x = val * 2;
     }
   });
 
-  measure('for...in', () => {
+  measure.run('for...in', () => {
     for (const key in arr) {
       const x = arr[key] * 2;
     }
   });
 
-  measure('while', () => {
+  measure.run('while', () => {
     let i = 0;
     while (i < arr.length) {
       const x = arr[i] * 2;
@@ -71,7 +61,7 @@ export default function () {
     }
   });
 
-  measure('do...while', () => {
+  measure.run('do...while', () => {
     let i = 0;
     do {
       const x = arr[i] * 2;
@@ -79,21 +69,21 @@ export default function () {
     } while (i < arr.length);
   });
 
-  measure('forEach', () => {
+  measure.run('forEach', () => {
     arr.forEach((val) => {
       const x = val * 2;
     });
   });
 
-  measure('map', () => {
+  measure.run('map', () => {
     arr.map((val) => val * 2);
   });
 
-  measure('reduce', () => {
+  measure.run('reduce', () => {
     arr.reduce((acc, val) => acc + val * 2, 0);
   });
 
-  measure('Array.from + forEach', () => {
+  measure.run('Array.from + forEach', () => {
     Array.from(arr).forEach((val) => {
       const x = val * 2;
     });

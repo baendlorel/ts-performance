@@ -1,3 +1,5 @@
+import { createMeasure } from '@/core';
+
 /**
  * 数组访问缓存性能测试
  * 测试在 for 循环中是否需要将 arr[i] 缓存到 const 变量的性能差异
@@ -12,45 +14,24 @@
  * - direct: 20.932ms
  * - cached: 7.768ms
  */
-export const meta = {
-  name: '数组访问缓存性能',
-};
+const measure = createMeasure('Array Access');
 export default function () {
-  const LEN = 100000000;
-  const arr = Array.from({ length: LEN }, (_, i) => i);
-  console.log('数组长度：', LEN);
+  const ARRAY_SIZE = 100000000;
+  const arr = Array.from({ length: ARRAY_SIZE }, (_, i) => i);
+  measure.setConfig({ ARRAY_SIZE });
 
-  // 方案2：缓存到 const
-  console.time('cached');
-  let sum2 = 0;
-  for (let i = 0; i < arr.length; i++) {
-    const a = arr[i];
-    sum2 += a * 2;
-  }
-  console.timeEnd('cached');
+  measure.run('const a = arr[i]', () => {
+    let s = 0;
+    for (let i = 0; i < arr.length; i++) {
+      const a = arr[i];
+      s += a * 2;
+    }
+  });
 
-  // 方案1：不缓存
-  console.time('direct');
-  let sum1 = 0;
-  for (let i = 0; i < arr.length; i++) {
-    sum1 += arr[i] * 2;
-  }
-  console.timeEnd('direct');
-
-  // 方案2：缓存到 const
-  console.time('cached');
-  let sum3 = 0;
-  for (let i = 0; i < arr.length; i++) {
-    const a = arr[i];
-    sum3 += a * 2;
-  }
-  console.timeEnd('cached');
-
-  // 方案1：不缓存
-  console.time('direct');
-  let sum4 = 0;
-  for (let i = 0; i < arr.length; i++) {
-    sum4 += arr[i] * 2;
-  }
-  console.timeEnd('direct');
+  measure.run('arr[i]', () => {
+    let sum1 = 0;
+    for (let i = 0; i < arr.length; i++) {
+      sum1 += arr[i] * 2;
+    }
+  });
 }

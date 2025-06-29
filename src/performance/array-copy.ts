@@ -1,3 +1,5 @@
+import { createMeasure } from '@/core';
+
 /**
  * 数组复制性能测试
  * 测试不同方式复制数组的性能差异
@@ -19,41 +21,26 @@
  * - for set: 53.17 ms
  * - for push: 55.54 ms
  */
-export const meta = {
-  name: '数组复制性能',
-};
+const measure = createMeasure('Array Copy');
 export default function () {
-  const TOTAL_RUNS = 100000; // 测试轮数
-  const ARRAY_SIZE = 100; // 每次数组大小
+  const RUN_TIME = 1000;
+  const ARRAY_SIZE = 10000;
+  const arr = Array(ARRAY_SIZE).fill(1);
 
-  function createArray() {
-    return Array(ARRAY_SIZE).fill(1);
-  }
+  measure.setConfig({ RUN_TIME, ARRAY_SIZE });
 
-  function benchmark(label: string, fn: Function) {
-    const start = performance.now();
-    for (let i = 0; i < TOTAL_RUNS; i++) {
-      const arr = createArray();
-      fn(arr);
-    }
-    const end = performance.now();
-    console.log(`${label}: ${(end - start).toFixed(2)} ms`);
-  }
-
-  console.log(`\n数组大小：${ARRAY_SIZE}，每种方案 ${TOTAL_RUNS} 次测试\n`);
-
-  benchmark('slice()', (arr: any[]) => arr.slice());
-  benchmark('展开运算符 ...', (arr: any[]) => [...arr]);
-  benchmark('concat()', (arr: any[]) => arr.concat());
-  benchmark('Array.from()', (arr: any[]) => Array.from(arr));
-  benchmark('loop set', (arr: any[]) => {
+  measure.run('slice()', () => arr.slice());
+  measure.run('[...old]', () => [...arr]);
+  measure.run('concat()', () => arr.concat());
+  measure.run('Array.from()', () => Array.from(arr));
+  measure.run('for a[i] = old[i]', () => {
     const a = [] as any[];
     for (let i = 0; i < arr.length; i++) {
       a[i] = arr[i];
     }
     return a;
   });
-  benchmark('loop push', (arr: any[]) => {
+  measure.run('for a.push(old[i])', () => {
     const a = [] as any[];
     for (let i = 0; i < arr.length; i++) {
       a.push(arr[i]);
