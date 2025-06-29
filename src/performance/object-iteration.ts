@@ -33,6 +33,10 @@
  * - map.foreach: 32.209ms
  */
 
+export const meta = {
+  name: '对象遍历性能',
+};
+
 export default function () {
   const ITERATIONS = 1_000;
   const OBJ_SIZE = 100;

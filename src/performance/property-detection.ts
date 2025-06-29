@@ -17,6 +17,10 @@
  * - Reflect.has: 25.5ms
  */
 
+export const meta = {
+  name: '对象属性检测性能',
+};
+
 export default function () {
   const obj = { a: 1, b: 2, c: 3 } as any;
   for (let i = 0; i < 10; i++) {

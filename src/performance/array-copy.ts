@@ -19,7 +19,9 @@
  * - for set: 53.17 ms
  * - for push: 55.54 ms
  */
-
+export const meta = {
+  name: '数组复制性能',
+};
 export default function () {
   const TOTAL_RUNS = 100000; // 测试轮数
   const ARRAY_SIZE = 100; // 每次数组大小

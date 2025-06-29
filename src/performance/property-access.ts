@@ -15,6 +15,10 @@
  * - reflect: 330.358ms (不明原因比10个属性还要快)
  */
 
+export const meta = {
+  name: '对象属性访问性能',
+};
+
 export default function () {
   const obj = { a: 1, b: 2, c: 3 } as any;
   for (let i = 0; i < 100000; i++) {

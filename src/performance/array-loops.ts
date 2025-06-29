@@ -27,6 +27,10 @@
  * - Array.from + forEach: 50.18ms
  */
 
+export const meta = {
+  name: '数组循环性能',
+};
+
 export default function () {
   const iterations = 10_000_000;
   const arr = Array.from({ length: iterations }, (_, i) => i);

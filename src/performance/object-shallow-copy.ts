@@ -24,6 +24,10 @@
  * - Reflect.get/set/ownKeys: 2.625s
  */
 
+export const meta = {
+  name: '对象浅拷贝性能',
+};
+
 export default function () {
   const chars = '_-+=#@&$ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 

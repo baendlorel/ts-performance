@@ -12,7 +12,9 @@
  * - direct: 20.932ms
  * - cached: 7.768ms
  */
-
+export const meta = {
+  name: '数组访问缓存性能',
+};
 export default function () {
   const LEN = 100000000;
   const arr = Array.from({ length: LEN }, (_, i) => i);

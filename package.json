@@ -7,14 +7,20 @@
     "test": "test"
   },
   "scripts": {
-    "dev": "tsx watch src/main.ts"
+    "dev": "tsx src/index.ts"
   },
   "keywords": [],
-  "author": "",
+  "author": {
+    "name": "KasukabeTsumugi",
+    "email": "futami16237@gmail.com"
+  },
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^24.0.7",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "reflect-deep": "^1.0.0"
   }
 }
