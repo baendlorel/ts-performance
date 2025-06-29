@@ -25,7 +25,11 @@ const formatNum2 = (n: string | number) => {
     return n;
   }
   const s = n.toString();
-  return `1e${s.length - 1}`;
+  if (s.length > 5) {
+    return `1e${s.length - 1}`;
+  } else {
+    return s;
+  }
 };
 
 const formatNum = formatNum2;
@@ -68,24 +72,31 @@ export const createMeasure = (testName: string) => new Measure(testName);
 
 const SPACE = ' '.repeat(4);
 export const displayResults = () => {
-  console.log(`\n=== ${Object.keys(results).length} 个测试结果 ===`);
+  console.log(`\n=== ${Object.keys(results).length} Results ===`);
+  console.log(`Time unit: ms`);
   // console.log(Object.keys(results).length);
   for (const [testName, configToGroup] of Object.entries(results)) {
     console.log(chalk.bold.underline(testName));
     for (const [configStr, group] of Object.entries(configToGroup)) {
+      console.log();
       console.log(SPACE, configStr);
       const arr = Array.from(Object.entries(group));
-      const maxLen = Math.max(...arr.map(([label]) => label.length));
+      const maxLabelLen = Math.max(...arr.map(([label]) => label.length));
+      const maxTimeLen = Math.max(...arr.map(([_, time]) => time.toFixed(3).length));
+
       arr.sort((a, b) => a[1] - b[1]);
+      const least = arr[0][1];
+
       for (let i = 0; i < arr.length; i++) {
         const [label, time] = arr[i];
+        const padLabel = label.padEnd(maxLabelLen + 1, ' ');
+        const padTime = time.toFixed(3).padEnd(maxTimeLen + 1, ' ');
+        const ratio = (time / least).toFixed(2);
         const msg =
           i === 0
-            ? chalk.underline.yellowBright(
-                `${label.padEnd(maxLen, ' ')}: ${time.toFixed(3)}`
-              )
-            : `${label.padEnd(maxLen, ' ')}: ${chalk.gray(time.toFixed(3))}`;
-        console.log(SPACE.repeat(2), msg);
+            ? chalk.yellowBright(`${padLabel}: ${padTime}`)
+            : `${padLabel}: ${chalk.gray(padTime)}`;
+        console.log(SPACE.repeat(2), msg, chalk.magenta(`${ratio}x`));
       }
     }
     console.log();

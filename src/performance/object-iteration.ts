@@ -57,7 +57,7 @@ export default function () {
     }
   });
 
-  measure.run('for...in + hasOwnProperty', () => {
+  measure.run('Object.keys + for', () => {
     const keys = Object.keys(obj);
     for (let j = 0; j < keys.length; j++) {
       const val = obj[keys[j]];
@@ -78,7 +78,7 @@ export default function () {
     }
   });
 
-  measure.run('map.foreach', () => {
+  measure.run('Extra: map.forEach', () => {
     map.forEach((v, k) => {
       const val = v; // 这里可以使用 k 或 v
       const key = k;
