@@ -61,11 +61,22 @@ class Measure {
       fn();
     }
     const end = performance.now();
-    ReflectDeep.set(
-      results,
-      [this.testName, this.configAsLabel, `${label}`],
-      end - start
-    );
+    ReflectDeep.set(results, [this.testName, this.configAsLabel, `${label}`], {
+      time: end - start,
+      extra: false,
+    });
+  }
+
+  extraRun(label: string, fn: () => void) {
+    const start = performance.now();
+    for (let i = 1; i <= this.config.RUN_TIME; i++) {
+      fn();
+    }
+    const end = performance.now();
+    ReflectDeep.set(results, [this.testName, this.configAsLabel, `${label}`], {
+      time: end - start,
+      extra: true,
+    });
   }
 }
 

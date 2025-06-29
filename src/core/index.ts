@@ -1,2 +1,2 @@
-export { displayResults } from './display';
+export { displayResults, displaySuggests } from './display';
 export { createMeasure } from './measure';

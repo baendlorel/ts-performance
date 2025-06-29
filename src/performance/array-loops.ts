@@ -33,7 +33,7 @@ export default function () {
   const arr = Array.from({ length: ARRAY_SIZE }, (_, i) => i);
   measure.setConfig({ ARRAY_SIZE });
 
-  measure.run('for', () => {
+  measure.run('for classic', () => {
     for (let i = 0; i < arr.length; i++) {
       const x = arr[i] * 2;
     }
@@ -79,11 +79,5 @@ export default function () {
 
   measure.run('reduce', () => {
     arr.reduce((acc, val) => acc + val * 2, 0);
-  });
-
-  measure.run('Array.from + forEach', () => {
-    Array.from(arr).forEach((val) => {
-      const x = val * 2;
-    });
   });
 }

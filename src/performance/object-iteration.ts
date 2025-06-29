@@ -78,7 +78,7 @@ export default function () {
     }
   });
 
-  measure.run('Extra: map.forEach', () => {
+  measure.extraRun('map.forEach', () => {
     map.forEach((v, k) => {
       const val = v; // 这里可以使用 k 或 v
       const key = k;

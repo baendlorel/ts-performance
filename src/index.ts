@@ -6,26 +6,31 @@
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import chalk from 'chalk';
-import { displayResults } from './core';
+import { displayResults, displaySuggests } from './core';
 
 async function runAllTests() {
   const title = chalk.blueBright('TypeScript Performance Test');
   console.log(`========= ${title} =========`);
   console.log();
 
+  const Running = chalk.yellow('Running');
   const performanceDir = join(process.cwd(), 'src', 'performance');
   const files = readdirSync(performanceDir);
+  console.time(`${Running} total`);
   for (const f of files) {
-    const Running = chalk.yellow('Running');
-    console.time(`${Running} ${f}`);
+    const label = `${Running} ${chalk.blue(f)}`;
+    console.time(label);
     const func = await import(join(performanceDir, f));
     if (typeof func === 'object' && func.default) {
       func.default();
     }
-    console.timeEnd(`${Running} ${f}`);
+    console.timeEnd(label);
   }
+  console.timeEnd(`${Running} total`);
+  console.log();
   displayResults();
-
+  console.log();
+  displaySuggests();
   console.log();
   console.log('✅ All tests completed successfully!');
 }
