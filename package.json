@@ -1,0 +1,20 @@
+{
+  "name": "ts-performance",
+  "version": "0.0.0",
+  "description": "TypeScript/JavaScript performance tests. Like for-of loop vs for.",
+  "main": "main.ts",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "dev": "tsx watch src/main.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^24.0.7",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  }
+}

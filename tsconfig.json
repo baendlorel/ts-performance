@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext", // 或 "ESNext"（根据需求）
+    "outDir": "./dist",
+    // "rootDir": "./src",
+    "noEmit": true, // 报错就不运行
+    "noEmitOnError": true, // 报错就不运行
+    "strict": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "baseUrl": ".", // 相对路径的起点
+    "paths": {
+      "@/*": ["src/*"] // 把 @ 映射到 src
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "test/**/*.ts"]
+}
