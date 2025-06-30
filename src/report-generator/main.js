@@ -178,23 +178,21 @@ function filterResults(searchTerm) {
         row.style.display = '';
         hasVisibleRows = true;
 
-        if (!term) {
-          return;
-        }
-
         // 添加高亮
-        const methodName = methodCell.querySelector('.approach-name');
-        if (methodName) {
-          const originalText = methodName.textContent;
-          // 使用Unicode转义序列避免正则表达式解析问题
-          const escapedTerm = term.replace(
-            /[\u002E\u002A\u002B\u003F\u0024\u005E\u007B\u007D\u0028\u0029\u007C\u005B\u005C\u005D]/g,
-            '\\$&'
-          );
-          methodName.innerHTML = originalText.replace(
-            new RegExp('(' + escapedTerm + ')', 'gi'),
-            '<span class="highlight">$1</span>'
-          );
+        if (term) {
+          const methodName = methodCell.querySelector('.approach-name');
+          if (methodName) {
+            const originalText = methodName.textContent;
+            // 使用Unicode转义序列避免正则表达式解析问题
+            const escapedTerm = term.replace(
+              /[\u002E\u002A\u002B\u003F\u0024\u005E\u007B\u007D\u0028\u0029\u007C\u005B\u005C\u005D]/g,
+              '\\$&'
+            );
+            methodName.innerHTML = originalText.replace(
+              new RegExp('(' + escapedTerm + ')', 'gi'),
+              '<span class="highlight">$1</span>'
+            );
+          }
         }
       } else {
         row.style.display = 'none';

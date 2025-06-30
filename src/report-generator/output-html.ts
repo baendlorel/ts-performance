@@ -88,7 +88,14 @@ const formatDT = (date = new Date()) => {
 };
 
 const outputToHTML = (html: string) => {
-  const id = readdirSync(join(process.cwd(), 'reports')).length + 1;
+  const id =
+    readdirSync(join(process.cwd(), 'reports')).reduce((prev, cur) => {
+      const isReport = /^id_[\d]+__[\d]{4}-[\d]{2}-[\d]{2}_[\d]{2}-[\d]{2}-[\d]{2}\u002Ehtml$/.test(
+        cur
+      );
+      const idStr = cur.replace('id_', '').replace(/__[.]*$/, '');
+      return isReport ? Math.max(prev, parseInt(idStr)) : prev;
+    }, 0) + 1;
   const dtm = formatDTForFilename();
   const outputPath = join(process.cwd(), 'reports', `id_${id}__${dtm}.html`);
   writeFileSync(outputPath, html, 'utf8');
