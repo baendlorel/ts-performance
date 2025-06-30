@@ -48,7 +48,7 @@ const getColor = (ratio: number): string => {
   }
 };
 
-function formatDateForFilename(date = new Date()) {
+const formatDateForFilename = (date = new Date()) => {
   const pad = (n: number) => n.toString().padStart(2, '0');
 
   const year = date.getFullYear();
@@ -59,6 +59,53 @@ function formatDateForFilename(date = new Date()) {
   const second = pad(date.getSeconds());
 
   return `${year}-${month}-${day}_${hour}-${minute}-${second}`;
+};
+type Attr = Record<string, string> & { className: string };
+class PseudoElement {
+  private static id = 1;
+  private readonly id: number;
+  private readonly tag: string;
+  private readonly attributes: Attr;
+  private readonly children: PseudoElement[];
+
+  public innerHTML: string = '';
+  constructor(opts: {
+    tag: string;
+    attributes?: Attr;
+    children?: PseudoElement[];
+    innerHTML?: string;
+  }) {
+    this.id = PseudoElement.id++;
+    const { tag, attributes = { className: '' }, children = [], innerHTML = '' } = opts;
+    this.tag = tag;
+    this.innerHTML = innerHTML;
+    this.attributes = { ...attributes };
+    this.children = children;
+    if (!Array.isArray(children) || children.some((c) => !c.isPE)) {
+      throw new Error('Invalid children');
+    }
+  }
+
+  get isPE() {
+    return true;
+  }
+
+  toHTML(): string {
+    const innerHTML =
+      this.children.length > 0
+        ? this.children.map((c) => c.toHTML()).join('')
+        : this.innerHTML;
+    const attrs = Object.entries(this.attributes)
+      .map(([key, value]) => {
+        if (key === 'className') {
+          return `class="${value}"`;
+        } else {
+          return `${key}="${value}"`;
+        }
+      })
+      .join(' ');
+    return `<${this.tag} ${attrs}>${innerHTML}</${this.tag}>`;
+  }
 }
 
 // 生成HTML页面
