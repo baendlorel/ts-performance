@@ -5,6 +5,25 @@ import chalk from 'chalk';
 import { results, suggests } from '@/core/result';
 import { h, PseudoElement } from './pseudo-element';
 
+// 格式化平均时间，自动选择合适的单位
+const formatAverageTime = (totalTime: number, runTime: number): string => {
+  const avgTime = totalTime / runTime; // 毫秒
+
+  if (avgTime >= 1000) {
+    // 大于等于1秒，显示秒
+    return `${(avgTime / 1000).toFixed(3)} s`;
+  } else if (avgTime >= 1) {
+    // 大于等于1毫秒，显示毫秒
+    return `${avgTime.toFixed(3)} ms`;
+  } else if (avgTime >= 0.001) {
+    // 大于等于1微秒，显示微秒
+    return `${(avgTime * 1000).toFixed(3)} μs`;
+  } else {
+    // 小于1微秒，显示纳秒
+    return `${(avgTime * 1000000).toFixed(0)} ns`;
+  }
+};
+
 // 清理 ANSI 控制字符
 const stripAnsi = (str: string): string => {
   return str.replace(/\x1b\[[0-9;]*m/g, '');
@@ -111,7 +130,7 @@ export const generateReport = () => {
 
   const len = Object.keys(results).length;
 
-  // 准备 suggests 数据（复制 display.ts 的逻辑）
+  // 准备 suggests 数据 - 智能推荐算法
   for (const [testName, configToGroup] of Object.entries(results)) {
     suggests.set(testName, new Map());
 
@@ -122,18 +141,18 @@ export const generateReport = () => {
 
       const arr = Array.from(Object.entries(group));
       arr.sort((a, b) => a[1].time - b[1].time);
-      const least = arr.find(([_, res]) => res.extra === false)![1];
+      const fastest = arr[0][1];
 
       for (const [label, res] of arr) {
-        const ratio = res.time / least.time;
-        if (ratio < 1.25) {
-          suggestMethods.push({
-            approach: label,
-            time: res.time,
-            ratio,
-            extra: res.extra,
-          });
-        }
+        const ratio = res.time / fastest.time;
+
+        suggestMethods.push({
+          approach: label,
+          time: res.time,
+          ratio,
+          extra: res.extra,
+          config: res.config,
+        });
       }
     }
   }
@@ -419,7 +438,7 @@ export const generateReport = () => {
     configToGroup.forEach((group, configStr) => {
       const suggestItems: PseudoElement[] = [];
 
-      group.forEach(({ approach: approach, time, ratio, extra }) => {
+      group.forEach(({ approach, time, ratio, extra, config }) => {
         const methodSpan = h({
           tag: 'span',
           attributes: {
@@ -437,11 +456,38 @@ export const generateReport = () => {
           )}x</span>`,
         });
 
+        // 计算平均时间
+        const runTime = config.RUN_TIME as number;
+        const avgTimeText = formatAverageTime(time, runTime);
+
+        const avgTimeSpan = h({
+          tag: 'span',
+          attributes: { className: 'avg-time' },
+          innerHTML: `<span class="avg-time-label">Avg:</span> ${avgTimeText}`,
+        });
+
+        const suggestionContent = h({
+          tag: 'div',
+          attributes: { className: 'suggest-content' },
+          children: [
+            h({
+              tag: 'div',
+              attributes: { className: 'suggest-header' },
+              children: [methodSpan, ratioSpan],
+            }),
+            h({
+              tag: 'div',
+              attributes: { className: 'suggest-metrics' },
+              children: [avgTimeSpan],
+            }),
+          ],
+        });
+
         suggestItems.push(
           h({
             tag: 'div',
             attributes: { className: 'suggest-item' },
-            children: [methodSpan, ratioSpan],
+            children: [suggestionContent],
           })
         );
       });

@@ -53,6 +53,7 @@ class Measure {
           ReflectDeep.set(results, [t.testName, config[CONFIG_LABEL], t.label], {
             time: end - start,
             extra: t.extra,
+            config: { ...config },
           });
         }
         console.timeEnd(timeLabel);
@@ -60,12 +61,7 @@ class Measure {
     }
   }
 
-  private addTask(opts: {
-    label: string;
-    extra: boolean;
-    focus: boolean;
-    fn: () => void;
-  }) {
+  private addTask(opts: { label: string; extra: boolean; focus: boolean; fn: () => void }) {
     this.tasks.push({
       configs: this.configs,
       fn: opts.fn,
@@ -101,9 +97,7 @@ class Measure {
   addConfig(config: Partial<Config>) {
     const newConfig = Object.assign({ RUN_TIME: 1 }, config) as Config;
     const label: string[] = [
-      `${chalk.blueBright('RUN_TIME')}: ${chalk.cyanBright(
-        formatNum(newConfig.RUN_TIME)
-      )}`,
+      `${chalk.blueBright('RUN_TIME')}: ${chalk.cyanBright(formatNum(newConfig.RUN_TIME))}`,
     ];
     for (const k in newConfig) {
       if (k === 'RUN_TIME') {

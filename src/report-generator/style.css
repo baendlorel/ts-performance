@@ -292,46 +292,56 @@ body {
   font-weight: 300;
 }
 .suggest-item {
+  display: block; /* 改为block */
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f3f4;
+}
+.suggest-item:last-child {
+  border-bottom: none;
+}
+.suggest-content {
+  width: 100%;
+}
+.suggest-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #e9ecef;
+}
+.suggest-metrics {
   display: flex;
   align-items: center;
-  font-size: 1.05em; /* 新增 */
+  margin: 6px 0;
+  padding: 4px 0;
 }
-.suggest-approach {
+
+.avg-time {
+  background: #e3f2fd;
+  color: #1565c0;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-weight: 500;
+  border: 1px solid #bbdefb;
+}
+
+.avg-time-label {
   font-weight: 600;
-  margin-right: 15px;
-  min-width: 200px;
+  margin-right: 4px;
+  opacity: 0.8;
 }
-.suggest-card {
-  background: white;
-  border: 1px solid #e1e5e9;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  display: flex;
-  overflow: hidden;
+
+/* 调整原有的suggest-item样式 */
+.suggest-item {
+  display: block; /* 改为block */
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f3f4;
 }
-.suggest-card-left {
-  background: #f8f9fa;
-  padding: 20px;
-  min-width: 260px;
-  border-right: 1px solid #e1e5e9;
-  align-items: center;
-  justify-content: center;
-}
-.suggest-card-title {
-  font-size: 1.2em; /* 从1.1em增大 */
-  font-weight: 600;
-  color: #495057;
-  text-align: center;
-}
-.suggest-card-right {
-  flex: 1;
-  padding: 10px 20px;
-}
-.suggest-card-content {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+
+.suggest-item:last-child {
+  border-bottom: none;
 }
 .footer {
   text-align: center;
