@@ -35,7 +35,7 @@ export const displayResults = () => {
   console.log();
 
   for (const [testName, configToGroup] of Object.entries(results)) {
-    const pad = ''.padEnd(title.length - testName.length, '=');
+    const pad = ''; // ''.padEnd(title.length - testName.length, '=');
     console.log(chalk.bold.underline(testName), pad);
 
     // Prepare suggest map

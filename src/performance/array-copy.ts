@@ -26,7 +26,7 @@ const RUN_TIME = 1000;
 const ARRAY_SIZE = 10000;
 const arr = Array(ARRAY_SIZE).fill(1);
 
-measure.setConfig({ RUN_TIME, ARRAY_SIZE });
+measure.addConfig({ RUN_TIME, ARRAY_SIZE });
 
 measure.add('slice()', () => arr.slice());
 measure.add('[...old]', () => [...arr]);

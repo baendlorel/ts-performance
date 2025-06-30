@@ -19,7 +19,7 @@ import { createMeasure } from '@/core';
 const measure = createMeasure('Property Access');
 const RUN_TIME = 1e6;
 const OBJ_SIZE = 1000;
-measure.setConfig({ RUN_TIME, OBJ_SIZE });
+measure.addConfig({ RUN_TIME, OBJ_SIZE });
 
 const obj = { a: 1, b: 2, c: 3 } as any;
 for (let i = 0; i < OBJ_SIZE; i++) {

@@ -38,7 +38,7 @@ const RUN_TIME = 1;
 const FIELD_COUNT = 100000;
 const FILED_LEN = 200;
 
-measure.setConfig({ RUN_TIME, FIELD_COUNT, FILED_LEN });
+measure.addConfig({ RUN_TIME, FIELD_COUNT, FILED_LEN });
 
 const o = {} as any;
 

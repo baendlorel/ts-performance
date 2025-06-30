@@ -30,7 +30,7 @@ import { createMeasure } from '@/core';
 const measure = createMeasure('Array Loops');
 const ARRAY_SIZE = 10_000_000;
 const arr = Array.from({ length: ARRAY_SIZE }, (_, i) => i);
-measure.setConfig({ ARRAY_SIZE });
+measure.addConfig({ ARRAY_SIZE });
 
 measure.add('for classic', () => {
   for (let i = 0; i < arr.length; i++) {

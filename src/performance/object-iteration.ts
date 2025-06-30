@@ -40,7 +40,7 @@ const OBJ_SIZE = 100;
 const obj: Record<string, number> = {};
 const map = new Map<string, number>();
 
-measure.setConfig({ RUN_TIME, OBJ_SIZE });
+measure.addConfig({ RUN_TIME, OBJ_SIZE });
 
 // 构造大对象
 for (let i = 0; i < OBJ_SIZE; i++) {

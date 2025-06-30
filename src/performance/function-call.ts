@@ -1,23 +1,28 @@
 import { createMeasure } from '@/core';
 
 const measure = createMeasure('Function Call');
-const RUN_TIME = 1000;
 
-measure.setConfig({ RUN_TIME });
+measure.addConfig({ RUN_TIME: 10 });
+measure.addConfig({ RUN_TIME: 1000 });
+measure.addConfig({ RUN_TIME: 10000000 });
 
 function test(x: number, y: number) {
   return x + y;
 }
 
-measure.focusTask('call', () => {
+measure.focus('()', () => {
+  test(1, 2);
+});
+
+measure.focus('call', () => {
   test.call(null, 1, 2);
 });
 
-measure.focusTask('apply', () => {
+measure.focus('apply', () => {
   test.apply(null, [1, 2]);
 });
 
-measure.focusTask('Reflect.apply', () => {
+measure.focus('Reflect.apply', () => {
   Reflect.apply(test, null, [1, 2]);
 });
 
