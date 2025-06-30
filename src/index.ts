@@ -31,6 +31,7 @@ async function runAllTests() {
   // displaySuggests();
   console.log();
   generateReport();
+  console.log();
   console.log('✅ All tests completed successfully!');
 }
 runAllTests();
