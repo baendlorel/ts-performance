@@ -14,6 +14,7 @@ const formatNumber = (num: number): string => {
 
 // 格式化配置字符串中的科学计数法数字
 const formatConfigString = (str: string): string => {
+  str = stripAnsi(str);
   // 匹配科学计数法数字 (如 1e7, 2.5e6 等)
   return str.replace(/(\d+(?:\.\d+)?)[eE]([+-]?\d+)/g, (match, base, exponent) => {
     const num = parseFloat(match);
@@ -21,34 +22,43 @@ const formatConfigString = (str: string): string => {
   });
 };
 
-// 颜色计算函数，返回CSS颜色
-const getColor = (ratio: number): string => {
+// 颜色计算函数，返回CSS颜色和文字颜色
+const getColor = (ratio: number): { bgColor: string; textColor: string } => {
   const ln = Math.log(ratio);
   const TOP = 10;
   const clampedLn = Math.max(0, Math.min(TOP, ln));
   const MID = 1.6;
 
+  let r: number, g: number, b: number;
+
   if (clampedLn <= MID) {
     // 0~5: 绿到黄 (绿色减少，红色增加)
     const t = clampedLn / MID;
-    const r = Math.round(255 * t);
-    const g = 255;
-    const b = 0;
-    return `rgb(${r}, ${g}, ${b})`;
+    r = Math.round(255 * t);
+    g = 255;
+    b = 0;
   } else if (clampedLn <= 2 * MID) {
     // 5~10: 黄到红 (绿色减少)
     const t = (clampedLn - MID) / MID;
-    const r = 255;
-    const g = Math.max(0, Math.round(255 * (1 - t)));
-    const b = 0;
-    return `rgb(${r}, ${g}, ${b})`;
+    r = 255;
+    g = Math.max(0, Math.round(255 * (1 - t)));
+    b = 0;
   } else {
-    const r = (225 * (TOP - clampedLn)) / TOP + 30;
-    return `rgb(${r}, 0, 0)`;
+    r = (225 * (TOP - clampedLn)) / TOP + 30;
+    g = 0;
+    b = 0;
   }
+
+  const bgColor = `rgb(${r}, ${g}, ${b})`;
+
+  // 计算亮度并决定文字颜色
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  const textColor = brightness > 150 ? '#000' : '#fff';
+
+  return { bgColor, textColor };
 };
 
-const formatDateForFilename = (date = new Date()) => {
+const formatDTForFilename = (date = new Date()) => {
   const pad = (n: number) => n.toString().padStart(2, '0');
 
   const year = date.getFullYear();
@@ -61,9 +71,22 @@ const formatDateForFilename = (date = new Date()) => {
   return `${year}-${month}-${day}_${hour}-${minute}-${second}`;
 };
 
+const formatDT = (date = new Date()) => {
+  const pad = (n: number) => n.toString().padStart(2, '0');
+
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  const hour = pad(date.getHours());
+  const minute = pad(date.getMinutes());
+  const second = pad(date.getSeconds());
+
+  return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+};
+
 const outputToHTML = (html: string) => {
   const id = readdirSync(join(process.cwd(), 'reports')).length + 1;
-  const dtm = formatDateForFilename();
+  const dtm = formatDTForFilename();
   const outputPath = join(process.cwd(), 'reports', `id${id}_${dtm}.html`);
   writeFileSync(outputPath, html, 'utf8');
   console.log(`HTML report generated: ${outputPath}`);
@@ -78,14 +101,14 @@ type PseudoElementConstructArgs = {
 };
 class PseudoElement {
   private static id = 1;
-  private readonly id: number;
+  private readonly id: string;
   private readonly tag: string;
   private readonly attributes: Attr;
   private readonly children: PseudoElement[];
 
   public innerHTML: string = '';
   constructor(args: PseudoElementConstructArgs) {
-    this.id = PseudoElement.id++;
+    this.id = `el${PseudoElement.id++}`;
     const { tag, attributes = { className: '' }, children = [], innerHTML = '' } = args;
     this.tag = tag;
     this.innerHTML = innerHTML;
@@ -98,6 +121,11 @@ class PseudoElement {
 
   get isPE() {
     return true;
+  }
+
+  // 生成JavaScript代码来引用这个元素
+  jsRef(): string {
+    return `document.getElementById('${this.id}')`;
   }
 
   toHTML(): string {
@@ -114,7 +142,7 @@ class PseudoElement {
         }
       })
       .join(' ');
-    return `<${this.tag} ${attrs}>${innerHTML}</${this.tag}>`;
+    return `<${this.tag} id="${this.id}" ${attrs}>${innerHTML}</${this.tag}>`;
   }
 }
 const h = (args: PseudoElementConstructArgs) => new PseudoElement(args);
@@ -150,7 +178,7 @@ export const generateReport = () => {
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #f8f9fa 0%, #bfc5cb 100%);
       min-height: 100vh;
       padding: 20px;
     }
@@ -163,7 +191,7 @@ export const generateReport = () => {
       overflow: hidden;
     }
     .header { 
-      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      background: linear-gradient(135deg, rgb(42 165 255) 0%, #1e3a8a 100%);
       color: white; 
       padding: 30px; 
       text-align: center; 
@@ -193,6 +221,33 @@ export const generateReport = () => {
       font-weight: 600; 
       color: #495057; 
       border-bottom: 1px solid #e1e5e9;
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+      transition: background-color 0.2s ease;
+    }
+    .test-title:hover {
+      background: #e9ecef;
+    }
+    .test-title::after {
+      content: '▼';
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      transition: transform 0.3s ease;
+      font-size: 0.8em;
+    }
+    .test-title.collapsed::after {
+      transform: translateY(-50%) rotate(-90deg);
+    }
+    .test-content {
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      max-height: 1000px;
+    }
+    .test-content.collapsed {
+      max-height: 0;
     }
     .config-section { 
       padding: 20px; 
@@ -215,6 +270,13 @@ export const generateReport = () => {
       font-weight: 600; 
       color: #495057;
       border-bottom: 2px solid #dee2e6;
+      position: relative;
+    }
+    .results-table th:nth-child(n+2) {
+      transition: background-color 0.2s ease;
+    }
+    .results-table th:nth-child(n+2):hover {
+      background: #dee2e6;
     }
     .results-table td { 
       padding: 10px 12px; 
@@ -234,8 +296,7 @@ export const generateReport = () => {
       padding: 4px 8px; 
       border-radius: 12px; 
       font-size: 0.85em; 
-      font-weight: 600; 
-      color: white;
+      font-weight: 600;
     }
     .extra-badge { 
       background: #e83e8c; 
@@ -247,6 +308,9 @@ export const generateReport = () => {
     }
     .best-result { 
       background: #fff3cd !important; 
+    }
+    .best-result .ratio-badge {
+      /* 确保最佳结果的ratio badge也使用自动计算的文字颜色 */
     }
     .suggests-section { 
       margin-top: 40px; 
@@ -280,6 +344,196 @@ export const generateReport = () => {
     }
   `;
 
+  // JavaScript代码用于展开/折叠功能
+  const script = `
+    document.addEventListener('DOMContentLoaded', function() {
+      const testTitles = document.querySelectorAll('.test-title');
+      
+      testTitles.forEach(title => {
+        title.addEventListener('click', function() {
+          const content = this.nextElementSibling;
+          if (content && content.classList.contains('test-content')) {
+            this.classList.toggle('collapsed');
+            content.classList.toggle('collapsed');
+            
+            // 使用ID存储展开/折叠状态到localStorage
+            const titleId = this.id;
+            const isCollapsed = this.classList.contains('collapsed');
+            localStorage.setItem('collapse_' + titleId, isCollapsed.toString());
+          }
+        });
+        
+        // 恢复之前的展开/折叠状态
+        const titleId = title.id;
+        const savedState = localStorage.getItem('collapse_' + titleId);
+        if (savedState === 'true') {
+          title.classList.add('collapsed');
+          const content = title.nextElementSibling;
+          if (content && content.classList.contains('test-content')) {
+            content.classList.add('collapsed');
+          }
+        }
+      });
+      
+      // 添加全局展开/折叠控制和搜索功能
+      const header = document.querySelector('.header');
+      const content = document.querySelector('.content');
+      if (header && content) {
+        const controlsDiv = document.createElement('div');
+        controlsDiv.innerHTML = \`
+          <div style="background: #f8f9fa; padding: 20px; border-bottom: 1px solid #e1e5e9; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <div style="display: flex; gap: 10px;">
+              <button onclick="toggleAllSections(false)" style="padding: 8px 16px; background: #007bff; border: none; color: white; border-radius: 4px; cursor: pointer; font-size: 14px;">Expand All</button>
+              <button onclick="toggleAllSections(true)" style="padding: 8px 16px; background: #6c757d; border: none; color: white; border-radius: 4px; cursor: pointer; font-size: 14px;">Collapse All</button>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <input type="text" id="searchInput" placeholder="Search methods..." style="padding: 8px 12px; border: 1px solid #ced4da; background: white; color: #495057; border-radius: 4px; width: 250px; font-size: 14px;">
+              <button onclick="clearSearch()" style="padding: 8px 16px; background: #6c757d; border: none; color: white; border-radius: 4px; cursor: pointer; font-size: 14px;">Clear</button>
+            </div>
+          </div>
+        \`;
+        
+        // 将控制区域插入到content的第一个位置
+        content.insertBefore(controlsDiv, content.firstChild);
+        
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', function() {
+          filterResults(this.value);
+        });
+      }
+    });
+    
+    function toggleAllSections(collapse) {
+      const testTitles = document.querySelectorAll('.test-title');
+      testTitles.forEach(title => {
+        const content = title.nextElementSibling;
+        if (content && content.classList.contains('test-content')) {
+          if (collapse) {
+            title.classList.add('collapsed');
+            content.classList.add('collapsed');
+          } else {
+            title.classList.remove('collapsed');
+            content.classList.remove('collapsed');
+          }
+          // 保存状态
+          localStorage.setItem('collapse_' + title.id, collapse.toString());
+        }
+      });
+    }
+    
+    // 添加表格排序功能
+    function addTableSorting() {
+      const tables = document.querySelectorAll('.results-table');
+      tables.forEach(table => {
+        const headers = table.querySelectorAll('th');
+        headers.forEach((header, index) => {
+          if (index > 0) { // 不对Method列排序，只对Time和Ratio列排序
+            header.style.cursor = 'pointer';
+            header.style.userSelect = 'none';
+            header.title = 'Click to sort';
+            header.innerHTML += ' ↕️';
+            header.addEventListener('click', () => sortTable(table, index));
+          }
+        });
+      });
+    }
+    
+    function sortTable(table, columnIndex) {
+      const tbody = table.querySelector('tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      
+      rows.sort((a, b) => {
+        const aText = a.cells[columnIndex].textContent.trim();
+        const bText = b.cells[columnIndex].textContent.trim();
+        
+        if (columnIndex === 1) { // Time column
+          const aValue = parseFloat(aText.replace(' ms', ''));
+          const bValue = parseFloat(bText.replace(' ms', ''));
+          return aValue - bValue;
+        } else if (columnIndex === 2) { // Ratio column
+          const aValue = parseFloat(aText.replace('x', ''));
+          const bValue = parseFloat(bText.replace('x', ''));
+          return aValue - bValue;
+        }
+        return 0;
+      });
+      
+      rows.forEach(row => tbody.appendChild(row));
+    }
+    
+    // 页面加载完成后初始化所有功能
+    setTimeout(() => {
+      addTableSorting();
+      
+      // 添加快捷键支持
+      document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey || e.metaKey) {
+          switch(e.key) {
+            case 'e':
+              e.preventDefault();
+              toggleAllSections(false);
+              break;
+            case 'c':
+              e.preventDefault();
+              toggleAllSections(true);
+              break;
+          }
+        }
+      });
+    }, 100);
+    
+    function filterResults(searchTerm) {
+      const rows = document.querySelectorAll('.results-table tbody tr');
+      const testSections = document.querySelectorAll('.test-section');
+      const term = searchTerm.toLowerCase();
+      
+      // 清除之前的高亮
+      document.querySelectorAll('.highlight').forEach(el => {
+        el.outerHTML = el.innerHTML;
+      });
+      
+      testSections.forEach(section => {
+        const sectionRows = section.querySelectorAll('.results-table tbody tr');
+        let hasVisibleRows = false;
+        
+        sectionRows.forEach(row => {
+          const methodCell = row.cells[0];
+          const methodText = methodCell.textContent.toLowerCase();
+          
+          if (!term || methodText.includes(term)) {
+            row.style.display = '';
+            hasVisibleRows = true;
+            
+            // 添加高亮
+            if (term) {
+              const methodName = methodCell.querySelector('.method-name');
+              if (methodName) {
+                const originalText = methodName.textContent;
+                const escapedTerm = term.replace(/[.*+?$^{}()|[\\]\\]/g, '\\\\$&');
+                const highlightedText = originalText.replace(new RegExp('(' + escapedTerm + ')', 'gi'), '<span class="highlight" style="background-color: #ffeb3b; color: #000; padding: 1px 2px; border-radius: 2px;">$1</span>');
+                methodName.innerHTML = highlightedText;
+              }
+            }
+          } else {
+            row.style.display = 'none';
+          }
+        });
+        
+        // 显示或隐藏整个test section
+        if (hasVisibleRows || !term) {
+          section.style.display = '';
+        } else {
+          section.style.display = 'none';
+        }
+      });
+    }
+    
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      filterResults('');
+    }
+  `;
+
   // 创建主要内容
   const resultsContent: PseudoElement[] = [];
 
@@ -297,84 +551,94 @@ export const generateReport = () => {
         const ratio = res.time / least.time;
         const isBest = res === least;
 
+        const methodCell = h({
+          tag: 'td',
+          innerHTML: `<span class="method-name">${label}</span>${
+            res.extra ? '<span class="extra-badge">EX</span>' : ''
+          }`,
+        });
+
+        const timeCell = h({
+          tag: 'td',
+          innerHTML: `<span class="time-value">${res.time.toFixed(3)} ms</span>`,
+        });
+
+        const { bgColor, textColor } = getColor(ratio);
+        const ratioCell = h({
+          tag: 'td',
+          innerHTML: `<span class="ratio-badge" style="background-color: ${bgColor}; color: ${textColor}">${ratio.toFixed(
+            2
+          )}x</span>`,
+        });
+
         const row = h({
           tag: 'tr',
           attributes: { className: isBest ? 'best-result' : '' },
-          children: [
-            h({
-              tag: 'td',
-              innerHTML: `<span class="method-name">${label}</span>${
-                res.extra ? '<span class="extra-badge">EX</span>' : ''
-              }`,
-            }),
-            h({
-              tag: 'td',
-              innerHTML: `<span class="time-value">${res.time.toFixed(3)} ms</span>`,
-            }),
-            h({
-              tag: 'td',
-              innerHTML: `<span class="ratio-badge" style="background-color: ${getColor(
-                ratio
-              )}">${ratio.toFixed(2)}x</span>`,
-            }),
-          ],
+          children: [methodCell, timeCell, ratioCell],
         });
 
         rows.push(row);
       }
 
+      const tableHeaders = [
+        h({ tag: 'th', innerHTML: 'Method' }),
+        h({ tag: 'th', innerHTML: 'Time' }),
+        h({ tag: 'th', innerHTML: 'Ratio' }),
+      ];
+
+      const tableHeaderRow = h({
+        tag: 'tr',
+        children: tableHeaders,
+      });
+
+      const tableHead = h({
+        tag: 'thead',
+        children: [tableHeaderRow],
+      });
+
+      const tableBody = h({
+        tag: 'tbody',
+        children: rows,
+      });
+
       const table = h({
         tag: 'table',
         attributes: { className: 'results-table' },
-        children: [
-          h({
-            tag: 'thead',
-            children: [
-              h({
-                tag: 'tr',
-                children: [
-                  h({ tag: 'th', innerHTML: 'Method' }),
-                  h({ tag: 'th', innerHTML: 'Time' }),
-                  h({ tag: 'th', innerHTML: 'Ratio' }),
-                ],
-              }),
-            ],
-          }),
-          h({
-            tag: 'tbody',
-            children: rows,
-          }),
-        ],
+        children: [tableHead, tableBody],
+      });
+
+      const configTitle = h({
+        tag: 'div',
+        attributes: { className: 'config-title' },
+        innerHTML: formatConfigString(configStr),
       });
 
       configSections.push(
         h({
           tag: 'div',
           attributes: { className: 'config-section' },
-          children: [
-            h({
-              tag: 'div',
-              attributes: { className: 'config-title' },
-              innerHTML: formatConfigString(configStr),
-            }),
-            table,
-          ],
+          children: [configTitle, table],
         })
       );
     }
+
+    const testTitle = h({
+      tag: 'div',
+      attributes: { className: 'test-title' },
+      innerHTML: testName,
+    });
+
+    const testContent = h({
+      tag: 'div',
+      attributes: { className: 'test-content' },
+      children: configSections,
+    });
 
     resultsContent.push(
       h({
         tag: 'div',
         attributes: { className: 'test-section' },
-        children: [
-          h({
-            tag: 'div',
-            attributes: { className: 'test-title' },
-            innerHTML: testName,
-          }),
-          ...configSections,
-        ],
+        children: [testTitle, testContent],
       })
     );
   }
@@ -389,152 +653,167 @@ export const generateReport = () => {
       const suggestItems: PseudoElement[] = [];
 
       group.forEach(({ method, time, ratio, extra }) => {
+        const methodSpan = h({
+          tag: 'span',
+          attributes: {
+            className: `suggest-method ${extra ? 'extra-method' : ''}`,
+          },
+          innerHTML: `${method}${extra ? '<span class="extra-badge">EX</span>' : ''}`,
+        });
+
+        const { bgColor, textColor } = getColor(ratio);
+        const ratioSpan = h({
+          tag: 'span',
+          attributes: { className: 'ratio-badge' },
+          innerHTML: `<span class="ratio-badge" style="background-color: ${bgColor}; color: ${textColor}">${ratio.toFixed(
+            2
+          )}x</span>`,
+        });
+
         suggestItems.push(
           h({
             tag: 'div',
             attributes: { className: 'suggest-item' },
-            children: [
-              h({
-                tag: 'span',
-                attributes: {
-                  className: `suggest-method ${extra ? 'extra-method' : ''}`,
-                },
-                innerHTML: `${method}${
-                  extra ? '<span class="extra-badge">EX</span>' : ''
-                }`,
-              }),
-              h({
-                tag: 'span',
-                attributes: { className: 'ratio-badge' },
-                innerHTML: `<span class="ratio-badge" style="background-color: ${getColor(
-                  ratio
-                )}">${ratio.toFixed(2)}x</span>`,
-              }),
-            ],
+            children: [methodSpan, ratioSpan],
           })
         );
       });
 
       if (configToGroup.size > 1) {
-        testSuggests.push(
-          h({
-            tag: 'div',
-            attributes: { className: 'config-title' },
-            innerHTML: formatConfigString(configStr),
-          })
-        );
+        const configTitle = h({
+          tag: 'div',
+          attributes: { className: 'config-title' },
+          innerHTML: formatConfigString(configStr),
+        });
+        testSuggests.push(configTitle);
       }
 
       testSuggests.push(...suggestItems);
     });
 
     if (testSuggests.length > 0) {
+      const suggestTestTitle = h({
+        tag: 'div',
+        attributes: { className: 'test-title' },
+        innerHTML: testName,
+      });
+
+      const suggestConfigSection = h({
+        tag: 'div',
+        attributes: { className: 'config-section' },
+        children: testSuggests,
+      });
+
       suggestsContent.push(
         h({
           tag: 'div',
           attributes: { className: 'test-section' },
-          children: [
-            h({
-              tag: 'div',
-              attributes: { className: 'test-title' },
-              innerHTML: testName,
-            }),
-            h({
-              tag: 'div',
-              attributes: { className: 'config-section' },
-              children: testSuggests,
-            }),
-          ],
+          children: [suggestTestTitle, suggestConfigSection],
         })
       );
     }
   });
 
   // 构建完整页面
+  const metaCharset = h({
+    tag: 'meta',
+    attributes: { className: '', charset: 'UTF-8' },
+  });
+
+  const metaViewport = h({
+    tag: 'meta',
+    attributes: {
+      className: '',
+      name: 'viewport',
+      content: 'width=device-width, initial-scale=1.0',
+    },
+  });
+
+  const pageTitle = h({
+    tag: 'title',
+    innerHTML: 'TypeScript Performance Test Report',
+  });
+
+  const pageStyles = h({
+    tag: 'style',
+    innerHTML: styles,
+  });
+
+  const pageScript = h({
+    tag: 'script',
+    innerHTML: script,
+  });
+
+  const pageHead = h({
+    tag: 'head',
+    children: [metaCharset, metaViewport, pageTitle, pageStyles, pageScript],
+  });
+
+  const headerTitle = h({
+    tag: 'h1',
+    innerHTML: 'TypeScript Performance Report',
+  });
+
+  const headerSubtitle = h({
+    tag: 'div',
+    attributes: { className: 'subtitle' },
+    innerHTML: `${len} Test Results (Time unit: ms) - Generated on ${formatDT()}`,
+  });
+
+  const pageHeader = h({
+    tag: 'div',
+    attributes: { className: 'header' },
+    children: [headerTitle, headerSubtitle],
+  });
+
+  const mainContent = h({
+    tag: 'div',
+    attributes: { className: 'content' },
+    children: resultsContent,
+  });
+
+  const suggestsTitle = h({
+    tag: 'h2',
+    attributes: { className: 'suggests-title' },
+    innerHTML: '📋 Performance Suggestions',
+  });
+
+  const suggestsSection =
+    suggestsContent.length > 0
+      ? h({
+          tag: 'div',
+          attributes: { className: 'suggests-section' },
+          children: [suggestsTitle, ...suggestsContent],
+        })
+      : null;
+
+  const pageFooter = h({
+    tag: 'div',
+    attributes: { className: 'footer' },
+    innerHTML: `Report generated by TypeScript Performance Tester | ${formatDT()}`,
+  });
+
+  const containerChildren = [pageHeader, mainContent];
+  if (suggestsSection) {
+    containerChildren.push(suggestsSection);
+  }
+  containerChildren.push(pageFooter);
+
+  const pageContainer = h({
+    tag: 'div',
+    attributes: { className: 'container' },
+    children: containerChildren,
+  });
+
+  const pageBody = h({
+    tag: 'body',
+    children: [pageContainer],
+  });
+
   const page = h({
     tag: 'html',
     attributes: { className: '', lang: 'zh-CN' },
-    children: [
-      h({
-        tag: 'head',
-        children: [
-          h({
-            tag: 'meta',
-            attributes: { className: '', charset: 'UTF-8' },
-          }),
-          h({
-            tag: 'meta',
-            attributes: {
-              className: '',
-              name: 'viewport',
-              content: 'width=device-width, initial-scale=1.0',
-            },
-          }),
-          h({
-            tag: 'title',
-            innerHTML: 'TypeScript Performance Test Report',
-          }),
-          h({
-            tag: 'style',
-            innerHTML: styles,
-          }),
-        ],
-      }),
-      h({
-        tag: 'body',
-        children: [
-          h({
-            tag: 'div',
-            attributes: { className: 'container' },
-            children: [
-              h({
-                tag: 'div',
-                attributes: { className: 'header' },
-                children: [
-                  h({
-                    tag: 'h1',
-                    innerHTML: 'TypeScript Performance Report',
-                  }),
-                  h({
-                    tag: 'div',
-                    attributes: { className: 'subtitle' },
-                    innerHTML: `${len} Test Results (Time unit: ms) - Generated on ${new Date().toLocaleString(
-                      'zh-CN'
-                    )}`,
-                  }),
-                ],
-              }),
-              h({
-                tag: 'div',
-                attributes: { className: 'content' },
-                children: resultsContent,
-              }),
-              ...(suggestsContent.length > 0
-                ? [
-                    h({
-                      tag: 'div',
-                      attributes: { className: 'suggests-section' },
-                      children: [
-                        h({
-                          tag: 'h2',
-                          attributes: { className: 'suggests-title' },
-                          innerHTML: '📋 Performance Suggestions',
-                        }),
-                        ...suggestsContent,
-                      ],
-                    }),
-                  ]
-                : []),
-              h({
-                tag: 'div',
-                attributes: { className: 'footer' },
-                innerHTML: `Report generated by TypeScript Performance Tester | ${formatDateForFilename()}`,
-              }),
-            ],
-          }),
-        ],
-      }),
-    ],
+    children: [pageHead, pageBody],
   });
 
   const html = '<!DOCTYPE html>\n' + page.toHTML();
