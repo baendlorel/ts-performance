@@ -25,50 +25,50 @@ import { createMeasure } from '@/core';
  * - Reflect.get/set/ownKeys: 2.625s
  */
 const measure = createMeasure('Object Shallow Copy');
-export default function () {
-  const chars = '_-+=#@&$ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const randStr = (length: number) => {
-    let result = '';
-    for (let i = 0; i < length; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
-  };
-
-  const RUN_TIME = 1;
-  const FIELD_COUNT = 100000;
-  const FILED_LEN = 200;
-
-  measure.setConfig({ RUN_TIME, FIELD_COUNT, FILED_LEN });
-
-  const o = {} as any;
-
-  for (let j = 0; j < FIELD_COUNT; j++) {
-    o[randStr(FILED_LEN)] = Math.random();
+const chars = '_-+=#@&$ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+const randStr = (length: number) => {
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
+  return result;
+};
 
-  measure.addTask('{...obj}', () => {
-    for (let i = 0; i < o.length; i++) {
-      const a = { ...o[i] };
-    }
-  });
+const RUN_TIME = 1;
+const FIELD_COUNT = 100000;
+const FILED_LEN = 200;
 
-  measure.addTask('Object.assign', () => {
-    for (let i = 0; i < o.length; i++) {
-      const a = Object.assign({}, o[i]);
-    }
-  });
+measure.setConfig({ RUN_TIME, FIELD_COUNT, FILED_LEN });
 
-  const g = Reflect.get;
-  const s = Reflect.set;
-  const ok = Reflect.ownKeys;
-  measure.addTask('Reflect.get/set/ownKeys', () => {
-    for (let i = 0; i < o.length; i++) {
-      const keys = ok(o[i]);
-      const a = {};
-      for (let j = 0; j < keys.length; j++) {
-        s(a, keys[j], g(o[i], keys[j]));
-      }
-    }
-  });
+const o = {} as any;
+
+for (let j = 0; j < FIELD_COUNT; j++) {
+  o[randStr(FILED_LEN)] = Math.random();
 }
+
+measure.add('{...obj}', () => {
+  for (let i = 0; i < o.length; i++) {
+    const a = { ...o[i] };
+  }
+});
+
+measure.add('Object.assign', () => {
+  for (let i = 0; i < o.length; i++) {
+    const a = Object.assign({}, o[i]);
+  }
+});
+
+const g = Reflect.get;
+const s = Reflect.set;
+const ok = Reflect.ownKeys;
+measure.add('Reflect.get/set/ownKeys', () => {
+  for (let i = 0; i < o.length; i++) {
+    const keys = ok(o[i]);
+    const a = {};
+    for (let j = 0; j < keys.length; j++) {
+      s(a, keys[j], g(o[i], keys[j]));
+    }
+  }
+});
+
+export {};

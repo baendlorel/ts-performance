@@ -22,29 +22,29 @@ import { createMeasure } from '@/core';
  * - for push: 55.54 ms
  */
 const measure = createMeasure('Array Copy');
-export default function () {
-  const RUN_TIME = 1000;
-  const ARRAY_SIZE = 10000;
-  const arr = Array(ARRAY_SIZE).fill(1);
+const RUN_TIME = 1000;
+const ARRAY_SIZE = 10000;
+const arr = Array(ARRAY_SIZE).fill(1);
 
-  measure.setConfig({ RUN_TIME, ARRAY_SIZE });
+measure.setConfig({ RUN_TIME, ARRAY_SIZE });
 
-  measure.addTask('slice()', () => arr.slice());
-  measure.addTask('[...old]', () => [...arr]);
-  measure.addTask('concat()', () => arr.concat());
-  measure.addTask('Array.from()', () => Array.from(arr));
-  measure.addTask('for a[i] = old[i]', () => {
-    const a = [] as any[];
-    for (let i = 0; i < arr.length; i++) {
-      a[i] = arr[i];
-    }
-    return a;
-  });
-  measure.addTask('for a.push(old[i])', () => {
-    const a = [] as any[];
-    for (let i = 0; i < arr.length; i++) {
-      a.push(arr[i]);
-    }
-    return a;
-  });
-}
+measure.add('slice()', () => arr.slice());
+measure.add('[...old]', () => [...arr]);
+measure.add('concat()', () => arr.concat());
+measure.add('Array.from()', () => Array.from(arr));
+measure.add('for a[i] = old[i]', () => {
+  const a = [] as any[];
+  for (let i = 0; i < arr.length; i++) {
+    a[i] = arr[i];
+  }
+  return a;
+});
+measure.add('for a.push(old[i])', () => {
+  const a = [] as any[];
+  for (let i = 0; i < arr.length; i++) {
+    a.push(arr[i]);
+  }
+  return a;
+});
+
+export {};

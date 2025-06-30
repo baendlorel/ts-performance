@@ -15,23 +15,23 @@ import { createMeasure } from '@/core';
  * - cached: 7.768ms
  */
 const measure = createMeasure('Array Access');
-export default function () {
-  const ARRAY_SIZE = 1000000;
-  const arr = Array.from({ length: ARRAY_SIZE }, (_, i) => i);
-  measure.setConfig({ ARRAY_SIZE });
+const ARRAY_SIZE = 1000000;
+const arr = Array.from({ length: ARRAY_SIZE }, (_, i) => i);
+measure.setConfig({ ARRAY_SIZE });
 
-  measure.addTask('const a = arr[i]', () => {
-    let s = 0;
-    for (let i = 0; i < arr.length; i++) {
-      const a = arr[i];
-      s += a * 2;
-    }
-  });
+measure.add('const a = arr[i]', () => {
+  let s = 0;
+  for (let i = 0; i < arr.length; i++) {
+    const a = arr[i];
+    s += a * 2;
+  }
+});
 
-  measure.addTask('arr[i]', () => {
-    let sum1 = 0;
-    for (let i = 0; i < arr.length; i++) {
-      sum1 += arr[i] * 2;
-    }
-  });
-}
+measure.add('arr[i]', () => {
+  let sum1 = 0;
+  for (let i = 0; i < arr.length; i++) {
+    sum1 += arr[i] * 2;
+  }
+});
+
+export {};

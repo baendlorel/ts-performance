@@ -13,20 +13,17 @@ async function runAllTests() {
   console.log(`========= ${title} =========`);
   console.log();
 
-  const Running = chalk.yellow('Running');
+  const prepareTitle = chalk.yellow('Loading');
   const performanceDir = join(process.cwd(), 'src', 'performance');
   const files = readdirSync(performanceDir);
-  console.time(`${Running} total`);
+  console.time(`${prepareTitle} total`);
   for (const f of files) {
-    const label = `${Running} ${chalk.blue(f)}`;
+    const label = `${prepareTitle} ${chalk.blue(f)}`;
     console.time(label);
-    const func = await import(join(performanceDir, f));
-    if (typeof func === 'object' && func.default) {
-      func.default();
-    }
+    await import(join(performanceDir, f));
     console.timeEnd(label);
   }
-  console.timeEnd(`${Running} total`);
+  console.timeEnd(`${prepareTitle} total`);
   run();
   console.log();
   displayResults();

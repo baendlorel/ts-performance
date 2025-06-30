@@ -19,21 +19,21 @@ import { createMeasure } from '@/core';
  * - Reflect.has: 25.5ms
  */
 const measure = createMeasure('Property detection');
-export default function () {
-  const RUN_TIME = 1e8;
-  const OBJ_SIZE = 10;
-  measure.setConfig({ RUN_TIME, OBJ_SIZE });
+const RUN_TIME = 1e8;
+const OBJ_SIZE = 10;
+measure.setConfig({ RUN_TIME, OBJ_SIZE });
 
-  const obj = { a: 1, b: 2, c: 3 } as any;
-  for (let i = 0; i < OBJ_SIZE; i++) {
-    obj['k' + i] = i;
-  }
-
-  measure.addTask('in', () => {
-    'a' in obj;
-  });
-
-  measure.addTask('Reflect.has', () => {
-    Reflect.has(obj, 'a');
-  });
+const obj = { a: 1, b: 2, c: 3 } as any;
+for (let i = 0; i < OBJ_SIZE; i++) {
+  obj['k' + i] = i;
 }
+
+measure.add('in', () => {
+  'a' in obj;
+});
+
+measure.add('Reflect.has', () => {
+  Reflect.has(obj, 'a');
+});
+
+export {};

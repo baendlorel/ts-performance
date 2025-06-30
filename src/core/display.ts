@@ -104,8 +104,9 @@ export const displaySuggests = () => {
         const padMethod = (extra ? chalk.magentaBright : chalk.yellowBright)(
           method.padEnd(maxLen + 1, ' ')
         );
+        const ratioStr = color(ratio)(`${ratio.toFixed(2)}x`);
         const EX = extra ? chalk.bgMagenta('EX') : '';
-        console.log(SPACE.repeat(2), `${padMethod}: ${ratio.toFixed(2)}x`, EX);
+        console.log(SPACE.repeat(2), `${padMethod}: ${ratioStr}`, EX);
       });
     });
     console.log();

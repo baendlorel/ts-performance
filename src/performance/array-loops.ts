@@ -28,56 +28,56 @@ import { createMeasure } from '@/core';
  * - Array.from + forEach: 50.18ms
  */
 const measure = createMeasure('Array Loops');
-export default function () {
-  const ARRAY_SIZE = 10_000_000;
-  const arr = Array.from({ length: ARRAY_SIZE }, (_, i) => i);
-  measure.setConfig({ ARRAY_SIZE });
+const ARRAY_SIZE = 10_000_000;
+const arr = Array.from({ length: ARRAY_SIZE }, (_, i) => i);
+measure.setConfig({ ARRAY_SIZE });
 
-  measure.addTask('for classic', () => {
-    for (let i = 0; i < arr.length; i++) {
-      const x = arr[i] * 2;
-    }
-  });
+measure.add('for classic', () => {
+  for (let i = 0; i < arr.length; i++) {
+    const x = arr[i] * 2;
+  }
+});
 
-  measure.addTask('for...of', () => {
-    for (const val of arr) {
-      const x = val * 2;
-    }
-  });
+measure.add('for...of', () => {
+  for (const val of arr) {
+    const x = val * 2;
+  }
+});
 
-  measure.addTask('for...in', () => {
-    for (const key in arr) {
-      const x = arr[key] * 2;
-    }
-  });
+measure.add('for...in', () => {
+  for (const key in arr) {
+    const x = arr[key] * 2;
+  }
+});
 
-  measure.addTask('while', () => {
-    let i = 0;
-    while (i < arr.length) {
-      const x = arr[i] * 2;
-      i++;
-    }
-  });
+measure.add('while', () => {
+  let i = 0;
+  while (i < arr.length) {
+    const x = arr[i] * 2;
+    i++;
+  }
+});
 
-  measure.addTask('do...while', () => {
-    let i = 0;
-    do {
-      const x = arr[i] * 2;
-      i++;
-    } while (i < arr.length);
-  });
+measure.add('do...while', () => {
+  let i = 0;
+  do {
+    const x = arr[i] * 2;
+    i++;
+  } while (i < arr.length);
+});
 
-  measure.addTask('forEach', () => {
-    arr.forEach((val) => {
-      const x = val * 2;
-    });
+measure.add('forEach', () => {
+  arr.forEach((val) => {
+    const x = val * 2;
   });
+});
 
-  measure.addTask('map', () => {
-    arr.map((val) => val * 2);
-  });
+measure.add('map', () => {
+  arr.map((val) => val * 2);
+});
 
-  measure.addTask('reduce', () => {
-    arr.reduce((acc, val) => acc + val * 2, 0);
-  });
-}
+measure.add('reduce', () => {
+  arr.reduce((acc, val) => acc + val * 2, 0);
+});
+
+export {};
