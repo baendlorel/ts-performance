@@ -33,17 +33,17 @@ class Measure {
   private static noFocusedTask = true;
 
   private testName: string = '';
-  private readonly configs: Config[] = [];
-  private readonly tasks: Task[] = [];
+  private configs: Config[] = [];
+  private tasks: Task[] = [];
 
   static run() {
     const running = chalk.yellowBright('Running');
-    console.log(Measure.tasks.length, 'tasks');
     for (const t of Measure.tasks) {
       if (Measure.noFocusedTask || t.focused) {
         const testName = chalk.rgb(255, 165, 0)(t.testName);
         const timeLabel = `${running} ${testName}`;
         console.time(timeLabel);
+
         for (const config of t.configs) {
           const start = performance.now();
           for (let i = 1; i <= config.RUN_TIME; i++) {
@@ -78,10 +78,13 @@ class Measure {
 
   private prepare(opts: { testName: string; fn: () => void; focus: boolean }) {
     this.testName = opts.testName;
-    this.tasks.length = 0; // clear previous tasks
+
+    // clear previous datas
+    this.tasks = [];
+    this.configs = [];
     opts.fn();
     if (opts.focus) {
-      Measure.noFocusedTask = true;
+      Measure.noFocusedTask = false;
       this.tasks.forEach((t) => (t.focused = true));
     }
     Measure.tasks.push(...this.tasks);

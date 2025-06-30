@@ -1,9 +1,9 @@
 import { measure } from '@/core';
 
-measure.focusTest('Function Call', () => {
+measure.createTest('Function Call', () => {
   measure.addConfig({ RUN_TIME: 10 });
   measure.addConfig({ RUN_TIME: 1000 });
-  measure.addConfig({ RUN_TIME: 10000000 });
+  measure.addConfig({ RUN_TIME: 1000000 });
 
   function test(x: number, y: number) {
     return x + y;
