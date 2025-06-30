@@ -16,8 +16,12 @@ export class PseudoElement {
 
   public innerHTML: string = '';
   constructor(args: PseudoElementConstructArgs) {
-    this.id = `el${PseudoElement.id++}`;
     const { tag, attributes = { className: '' }, children = [], innerHTML = '' } = args;
+    if (typeof attributes.id === 'string') {
+      this.id = attributes.id;
+    } else {
+      this.id = `el${PseudoElement.id++}`;
+    }
     this.tag = tag;
     this.innerHTML = innerHTML;
     this.attributes = { ...attributes };

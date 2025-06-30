@@ -330,13 +330,13 @@ export const generateReport = () => {
 
   // 添加建议标题
   if (suggests.size > 0) {
-    suggestsContent.push(
-      h({
-        tag: 'h2',
-        attributes: { className: 'suggests-title' },
-        innerHTML: '📋 Performance Suggestions',
-      })
-    );
+    // suggestsContent.push(
+    //   h({
+    //     tag: 'h2',
+    //     attributes: { className: 'suggests-title' },
+    //     innerHTML: '📋 Performance Suggestions',
+    //   })
+    // );
   }
 
   suggests.forEach((configToGroup, testName) => {
