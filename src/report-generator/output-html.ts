@@ -88,17 +88,9 @@ const formatDT = (date = new Date()) => {
   return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
 };
 
-const outputToHTML = (html: string) => {
-  const id =
-    readdirSync(join(process.cwd(), 'reports')).reduce((prev, cur) => {
-      const isReport = /^id_[\d]+__[\d]{4}-[\d]{2}-[\d]{2}_[\d]{2}-[\d]{2}-[\d]{2}\u002Ehtml$/.test(
-        cur
-      );
-      const idStr = cur.replace('id_', '').replace(/__[.]*$/, '');
-      return isReport ? Math.max(prev, parseInt(idStr)) : prev;
-    }, 0) + 1;
+const outputToHTML = (html: string, reportId: number) => {
   const dtm = formatDTForFilename();
-  const outputPath = join(process.cwd(), 'reports', `id_${id}__${dtm}.html`);
+  const outputPath = join(process.cwd(), 'reports', `id_${reportId}__${dtm}.html`);
   writeFileSync(outputPath, html, 'utf8');
   console.log(
     chalk.yellowBright(`HTML Report Generated`),
@@ -108,6 +100,15 @@ const outputToHTML = (html: string) => {
 
 // 生成HTML页面
 export const generateReport = () => {
+  const reportId =
+    readdirSync(join(process.cwd(), 'reports')).reduce((prev, cur) => {
+      const isReport = /^id_[\d]+__[\d]{4}-[\d]{2}-[\d]{2}_[\d]{2}-[\d]{2}-[\d]{2}\u002Ehtml$/.test(
+        cur
+      );
+      const idStr = cur.replace('id_', '').replace(/__[.]*$/, '');
+      return isReport ? Math.max(prev, parseInt(idStr)) : prev;
+    }, 0) + 1;
+
   const len = Object.keys(results).length;
 
   // 准备 suggests 数据（复制 display.ts 的逻辑）
@@ -146,7 +147,10 @@ export const generateReport = () => {
   // 创建控制按钮
   const controlsContainer = h({
     tag: 'div',
-    attributes: { className: 'controls-container' },
+    attributes: {
+      className: 'controls-container',
+      tabgroup: 'results',
+    },
     children: [
       h({
         tag: 'div',
@@ -382,6 +386,19 @@ export const generateReport = () => {
 
   // 创建建议部分
   const suggestsContent: PseudoElement[] = [];
+  const suggestNavigationItems: PseudoElement[] = [];
+
+  // 添加"显示全部"导航项
+  suggestNavigationItems.push(
+    h({
+      tag: 'div',
+      attributes: {
+        className: 'nav-item active',
+        onclick: 'showAllSuggests()',
+      },
+      innerHTML: '📋 Show All Suggestions',
+    })
+  );
 
   // 添加建议标题
   if (suggests.size > 0) {
@@ -394,7 +411,9 @@ export const generateReport = () => {
     // );
   }
 
+  let suggestIndex = 0;
   suggests.forEach((configToGroup, testName) => {
+    suggestIndex++;
     const cardContent: PseudoElement[] = [];
 
     configToGroup.forEach((group, configStr) => {
@@ -442,7 +461,10 @@ export const generateReport = () => {
     if (cardContent.length > 0) {
       const suggestCard = h({
         tag: 'div',
-        attributes: { className: 'suggest-card' },
+        attributes: {
+          className: 'suggest-card',
+          'data-suggest-name': testName,
+        },
         children: [
           h({
             tag: 'div',
@@ -451,7 +473,7 @@ export const generateReport = () => {
               h({
                 tag: 'div',
                 attributes: { className: 'suggest-card-title' },
-                innerHTML: testName,
+                innerHTML: `<span class="suggest-number">${suggestIndex}.</span> ${testName}`,
               }),
             ],
           }),
@@ -470,7 +492,40 @@ export const generateReport = () => {
       });
 
       suggestsContent.push(suggestCard);
+
+      // 添加建议导航项
+      suggestNavigationItems.push(
+        h({
+          tag: 'div',
+          attributes: {
+            className: 'nav-item',
+            onclick: `showSuggest('${testName}')`,
+          },
+          innerHTML: `<span class="nav-number">${suggestIndex}.</span> ${testName}`,
+        })
+      );
     }
+  });
+
+  // 创建建议导航栏
+  const suggestNavigation = h({
+    tag: 'div',
+    attributes: { className: 'test-navigation' },
+    children: suggestNavigationItems,
+  });
+
+  // 创建建议容器
+  const suggestsContainer = h({
+    tag: 'div',
+    attributes: { className: 'results-container' },
+    children: suggestsContent,
+  });
+
+  // 创建带导航的建议区域
+  const suggestsWithNav = h({
+    tag: 'div',
+    attributes: { className: 'results-with-nav' },
+    children: [suggestNavigation, suggestsContainer],
   });
 
   // 构建完整页面
@@ -510,7 +565,7 @@ export const generateReport = () => {
 
   const headerTitle = h({
     tag: 'h1',
-    innerHTML: 'TypeScript Performance Report',
+    innerHTML: `TypeScript Performance Report <small style="opacity:0.8;">#${reportId}</small>`,
   });
 
   const headerSubtitle = h({
@@ -531,8 +586,9 @@ export const generateReport = () => {
     attributes: {
       className: 'tab-content',
       id: 'results-content',
+      tabgroup: 'results',
     },
-    children: [controlsContainer, resultsWithNav],
+    children: [resultsWithNav],
   });
 
   // 创建 Suggests 标签页内容
@@ -541,10 +597,11 @@ export const generateReport = () => {
     attributes: {
       className: 'tab-content',
       id: 'suggests-content',
+      tabgroup: 'suggests',
     },
     children:
       suggestsContent.length > 0
-        ? suggestsContent
+        ? [suggestsWithNav]
         : [
             h({
               tag: 'div',
@@ -559,7 +616,7 @@ export const generateReport = () => {
   const tabsContainer = h({
     tag: 'div',
     attributes: { className: 'tabs-container' },
-    children: [tabButtons, resultsTabContent, suggestsTabContent],
+    children: [tabButtons, controlsContainer, resultsTabContent, suggestsTabContent],
   });
 
   const mainContent = h({
@@ -594,5 +651,5 @@ export const generateReport = () => {
   });
 
   const html = '<!DOCTYPE html>\n' + page.toHTML();
-  outputToHTML(html);
+  outputToHTML(html, reportId);
 };

@@ -8,6 +8,7 @@ body {
   background: linear-gradient(135deg, #f8f9fa 0%, #bfc5cb 100%);
   min-height: 100vh;
   padding: 20px;
+  font-size: 16px; /* 增大基础字体 */
 }
 .container {
   max-width: 1200px;
@@ -63,11 +64,11 @@ body {
 }
 .header h1 {
   font-size: 2.5em;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   font-weight: 300;
 }
 .header .subtitle {
-  font-size: 1.2em;
+  font-size: 1.2em; /* 从1.2em增大 */
   opacity: 0.9;
 }
 .controls-container {
@@ -92,12 +93,12 @@ body {
   align-items: center;
 }
 .control-btn {
-  padding: 8px 16px;
+  padding: 10px 18px; /* 从8px 16px增大 */
   border: none;
   color: white;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 15px; /* 从14px增大 */
   transition: background-color 0.2s;
 }
 .control-btn.expand {
@@ -119,13 +120,13 @@ body {
   background: #545b62;
 }
 .search-input {
-  padding: 8px 12px;
+  padding: 10px 14px; /* 从8px 12px增大 */
   border: 1px solid #ced4da;
   background: white;
   color: #495057;
   border-radius: 4px;
-  width: 250px;
-  font-size: 14px;
+  width: 280px; /* 从250px增大 */
+  font-size: 15px; /* 从14px增大 */
 }
 .tabs-container {
   border-bottom: 1px solid #e1e5e9;
@@ -136,21 +137,21 @@ body {
   border-bottom: 1px solid #e1e5e9;
 }
 .tab-btn {
-  padding: 18px 30px;
+  padding: 15px 35px; /* 从18px 30px增大 */
   background: transparent;
   border: none;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 19px; /* 从18px增大 */
   font-weight: 500;
   border-bottom: 3px solid transparent;
   transition: all 0.2s;
   color: #495057;
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: 10px; /* 从8px增大 */
 }
 .tab-btn .emoji {
-  font-size: 22px;
+  font-size: 24px; /* 从22px增大 */
 }
 .tab-btn.active {
   background: white;
@@ -179,8 +180,8 @@ body {
 }
 .test-title {
   background: #f8f9fa;
-  padding: 10px 20px;
-  font-size: 1.4em;
+  padding: 12px 22px; /* 从10px 20px增大 */
+  font-size: 1.5em; /* 从1.4em增大 */
   font-weight: 600;
   color: #495057;
   border-bottom: 1px solid #e1e5e9;
@@ -216,7 +217,7 @@ body {
   padding: 20px;
 }
 .config-title {
-  font-size: 1.1em;
+  font-size: 1.2em; /* 从1.1em增大 */
   color: #6c757d;
   margin-bottom: 15px;
   font-weight: 500;
@@ -228,12 +229,13 @@ body {
 }
 .results-table th {
   background: #e9ecef;
-  padding: 12px;
+  padding: 14px; /* 从12px增大 */
   text-align: left;
   font-weight: 600;
   color: #495057;
   border-bottom: 2px solid #dee2e6;
   position: relative;
+  font-size: 1.05em; /* 新增 */
 }
 .results-table th:nth-child(n + 2) {
   transition: background-color 0.2s ease;
@@ -242,8 +244,9 @@ body {
   background: #dee2e6;
 }
 .results-table td {
-  padding: 6px 12px;
+  padding: 8px 14px; /* 从6px 12px增大 */
   border-bottom: 1px solid #dee2e6;
+  font-size: 1.02em; /* 新增 */
 }
 .results-table tr:hover {
   background: #f8f9fa;
@@ -256,17 +259,17 @@ body {
   font-weight: 600;
 }
 .ratio-badge {
-  padding: 4px 8px;
+  padding: 5px 10px; /* 从4px 8px增大 */
   border-radius: 12px;
-  font-size: 0.85em;
+  font-size: 0.9em; /* 从0.85em增大 */
   font-weight: 600;
 }
 .extra-badge {
   background: #e83e8c;
   color: white;
-  padding: 2px 6px;
+  padding: 3px 7px; /* 从2px 6px增大 */
   border-radius: 4px;
-  font-size: 0.7em;
+  font-size: 0.75em; /* 从0.7em增大 */
   margin-left: 8px;
 }
 .best-result {
@@ -291,7 +294,7 @@ body {
 .suggest-item {
   display: flex;
   align-items: center;
-  padding: 8px 0;
+  font-size: 1.05em; /* 新增 */
 }
 .suggest-approach {
   font-weight: 600;
@@ -312,19 +315,18 @@ body {
   padding: 20px;
   min-width: 200px;
   border-right: 1px solid #e1e5e9;
-  display: flex;
   align-items: center;
   justify-content: center;
 }
 .suggest-card-title {
-  font-size: 1.1em;
+  font-size: 1.2em; /* 从1.1em增大 */
   font-weight: 600;
   color: #495057;
   text-align: center;
 }
 .suggest-card-right {
   flex: 1;
-  padding: 20px;
+  padding: 10px 20px;
 }
 .suggest-card-content {
   display: flex;
@@ -337,6 +339,7 @@ body {
   color: #6c757d;
   border-top: 1px solid #e1e5e9;
   background: #f8f9fa;
+  font-size: 1.02em; /* 新增 */
 }
 
 .highlight {
@@ -365,14 +368,14 @@ body {
 }
 
 .nav-item {
-  padding: 12px 16px;
+  padding: 14px 18px; /* 从12px 16px增大 */
   margin-bottom: 8px;
   background: white;
   border: 1px solid #dee2e6;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 14px;
+  font-size: 15px; /* 从14px增大 */
   font-weight: 500;
   color: #495057;
 }
@@ -400,13 +403,15 @@ body {
   min-width: 0; /* 防止flex子项溢出 */
 }
 
-.test-section.hidden {
+.test-section.hidden,
+.suggest-card.hidden {
   display: none;
 }
 
 /* 测试序号样式 */
 .test-number,
-.nav-number {
+.nav-number,
+.suggest-number {
   color: #6c757d;
   font-weight: 500;
   margin-right: 8px;
@@ -420,4 +425,8 @@ body {
   font-size: 0.85em;
   display: inline-block;
   min-width: 20px;
+}
+
+.suggest-card-title .suggest-number {
+  font-size: 0.9em;
 }

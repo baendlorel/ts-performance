@@ -1,10 +1,10 @@
+const $ = document.querySelectorAll;
+
 document.addEventListener('DOMContentLoaded', function () {
   // 初始化标签页
   initTabs();
 
-  const testTitles = document.querySelectorAll('.test-title');
-
-  testTitles.forEach((title) => {
+  $('.test-title').forEach((title) => {
     title.addEventListener('click', function () {
       const content = this.nextElementSibling;
       if (content && content.classList.contains('test-content')) {
@@ -57,18 +57,17 @@ function initTabs() {
 
 function switchTab(tabName) {
   // 移除所有active状态
-  document.querySelectorAll('.tab-btn').forEach((btn) => btn.classList.remove('active'));
-  document
-    .querySelectorAll('.tab-content')
-    .forEach((content) => content.classList.remove('active'));
+  $('.tab-btn').forEach((btn) => btn.classList.remove('active'));
+  $('[tabgroup]').forEach((content) => content.classList.remove('active'));
 
   // 激活指定标签页
   const targetBtn = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
-  const targetContent = document.getElementById(tabName + '-content');
+  const targetContents = $(`[tabgroup="${tabName}"]`);
+  // document.getElementById(tabName + '-content');
 
-  if (targetBtn && targetContent) {
+  if (targetBtn && targetContents.length) {
     targetBtn.classList.add('active');
-    targetContent.classList.add('active');
+    targetContents.forEach((targetContent) => targetContent.classList.add('active'));
 
     // 保存选择的标签页
     localStorage.setItem('activeTab', tabName);
@@ -76,8 +75,7 @@ function switchTab(tabName) {
 }
 
 function toggleAllSections(collapse) {
-  const testTitles = document.querySelectorAll('.test-title');
-  testTitles.forEach((title) => {
+  $('.test-title').forEach((title) => {
     const content = title.nextElementSibling;
     if (content && content.classList.contains('test-content')) {
       if (collapse) {
@@ -95,8 +93,7 @@ function toggleAllSections(collapse) {
 
 // 添加表格排序功能
 function addTableSorting() {
-  const tables = document.querySelectorAll('.results-table');
-  tables.forEach((table) => {
+  $('.results-table').forEach((table) => {
     const headers = table.querySelectorAll('th');
     headers.forEach((header, index) => {
       if (index > 0) {
@@ -158,15 +155,14 @@ setTimeout(() => {
 }, 100);
 
 function filterResults(searchTerm = '') {
-  const testSections = document.querySelectorAll('.test-section');
   const term = searchTerm.toLowerCase();
 
   // 清除之前的高亮
-  document.querySelectorAll('.highlight').forEach((el) => {
+  $('.highlight').forEach((el) => {
     el.outerHTML = el.innerHTML;
   });
 
-  testSections.forEach((section) => {
+  $('.test-section').forEach((section) => {
     const sectionRows = section.querySelectorAll('.results-table tbody tr');
     let hasVisibleRows = false;
 
@@ -216,13 +212,12 @@ function clearSearch() {
 // 导航功能
 function showAllTests() {
   // 显示所有测试
-  const testSections = document.querySelectorAll('.test-section');
-  testSections.forEach((section) => {
+  $('.test-section').forEach((section) => {
     section.classList.remove('hidden');
   });
 
   // 更新导航项状态
-  const navItems = document.querySelectorAll('.nav-item');
+  const navItems = $('.nav-item');
   navItems.forEach((item) => {
     item.classList.remove('active');
   });
@@ -238,8 +233,7 @@ function showTest(testName) {
   clearSearch();
 
   // 隐藏所有测试
-  const testSections = document.querySelectorAll('.test-section');
-  testSections.forEach((section) => {
+  $('.test-section').forEach((section) => {
     if (section.getAttribute('data-test-name') === testName) {
       section.classList.remove('hidden');
     } else {
@@ -248,7 +242,46 @@ function showTest(testName) {
   });
 
   // 更新导航项状态
-  const navItems = document.querySelectorAll('.nav-item');
+  $('.nav-item').forEach((item) => {
+    item.classList.remove('active');
+    // 通过onclick属性判断是否为当前项
+    const onclick = item.getAttribute('onclick');
+    if (onclick && onclick.includes(JSON.stringify(testName))) {
+      item.classList.add('active');
+    }
+  });
+}
+
+// 建议页面导航功能
+function showAllSuggests() {
+  // 显示所有建议
+  $('.suggest-card').forEach((card) => card.classList.remove('hidden'));
+
+  // 更新导航项状态
+  const suggestsTabContent = document.getElementById('suggests-content');
+  const navItems = suggestsTabContent.querySelectorAll('.nav-item');
+  navItems.forEach((item) => item.classList.remove('active'));
+
+  // 激活"显示全部"项
+  const showAllItem = navItems[0]; // 第一个是"显示全部"
+  if (showAllItem) {
+    showAllItem.classList.add('active');
+  }
+}
+
+function showSuggest(testName) {
+  // 隐藏所有建议
+  $('.suggest-card').forEach((card) => {
+    if (card.getAttribute('data-suggest-name') === testName) {
+      card.classList.remove('hidden');
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+
+  // 更新导航项状态
+  const suggestsTabContent = document.getElementById('suggests-content');
+  const navItems = suggestsTabContent.querySelectorAll('.nav-item');
   navItems.forEach((item) => {
     item.classList.remove('active');
     // 通过onclick属性判断是否为当前项
