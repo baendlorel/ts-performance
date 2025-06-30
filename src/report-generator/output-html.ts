@@ -447,15 +447,24 @@ export const generateReport = () => {
       });
 
       if (configToGroup.size > 1) {
+        // 当有多个config时，创建config分组
         const configTitle = h({
           tag: 'div',
           attributes: { className: 'config-title' },
           innerHTML: formatConfigString(configStr),
         });
-        cardContent.push(configTitle);
-      }
 
-      cardContent.push(...suggestItems);
+        const configGroup = h({
+          tag: 'div',
+          attributes: { className: 'suggest-config-group' },
+          children: suggestItems,
+        });
+
+        cardContent.push(configTitle, configGroup);
+      } else {
+        // 只有一个config时，直接添加items
+        cardContent.push(...suggestItems);
+      }
     });
 
     if (cardContent.length > 0) {

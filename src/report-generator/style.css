@@ -313,7 +313,7 @@ body {
 .suggest-card-left {
   background: #f8f9fa;
   padding: 20px;
-  min-width: 200px;
+  min-width: 260px;
   border-right: 1px solid #e1e5e9;
   align-items: center;
   justify-content: center;
@@ -429,4 +429,31 @@ body {
 
 .suggest-card-title .suggest-number {
   font-size: 0.9em;
+}
+
+/* 建议页面config和item的改进样式 */
+.suggest-card-content .config-title {
+  font-size: 1.05em;
+  color: #6c757d;
+  margin-bottom: 8px; /* 减少下方间距 */
+  margin-top: 15px; /* 添加上方间距分隔 */
+  font-weight: 600;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 5px;
+}
+
+.suggest-card-content .config-title:first-child {
+  margin-top: 0; /* 第一个config标题不需要上方间距 */
+}
+
+/* 为config相关的suggest items添加缩进和样式 */
+.suggest-config-group {
+  margin-left: 20px;
+  border-left: 2px solid #e9ecef;
+  padding-left: 15px;
+  margin-bottom: 10px;
+}
+
+.suggest-config-group .suggest-item {
+  margin-bottom: 6px;
 }

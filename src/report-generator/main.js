@@ -1,4 +1,4 @@
-const $ = document.querySelectorAll;
+const $ = (...args) => document.querySelectorAll(...args);
 
 document.addEventListener('DOMContentLoaded', function () {
   // 初始化标签页
