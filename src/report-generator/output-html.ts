@@ -287,6 +287,14 @@ export const generateReport = () => {
           innerHTML: `<span class="time-value">${res.time.toFixed(3)} ms</span>`,
         });
 
+        // 计算平均时间
+        const runTime = res.config.RUN_TIME as number;
+        const avgTimeText = formatAverageTime(res.time, runTime);
+        const avgTimeCell = h({
+          tag: 'td',
+          innerHTML: `<span class="avg-time">${avgTimeText}</span>`,
+        });
+
         const { bgColor, textColor } = getColor(ratio);
         const ratioCell = h({
           tag: 'td',
@@ -298,7 +306,7 @@ export const generateReport = () => {
         const row = h({
           tag: 'tr',
           attributes: { className: isBest ? 'best-result' : '' },
-          children: [methodCell, timeCell, ratioCell],
+          children: [methodCell, timeCell, avgTimeCell, ratioCell],
         });
 
         rows.push(row);
@@ -306,13 +314,19 @@ export const generateReport = () => {
 
       const tableHeaders = [
         h({ tag: 'th', innerHTML: 'Approach' }),
-        h({ tag: 'th', innerHTML: 'Time' }),
+        h({ tag: 'th', innerHTML: 'Total Time' }),
+        h({ tag: 'th', innerHTML: 'Avg Time' }),
         h({ tag: 'th', innerHTML: 'Ratio' }),
       ];
 
       const tableHeaderRow = h({
         tag: 'tr',
         children: tableHeaders,
+      });
+
+      const tableCaption = h({
+        tag: 'caption',
+        innerHTML: formatConfigString(configStr),
       });
 
       const tableHead = h({
@@ -328,43 +342,36 @@ export const generateReport = () => {
       const table = h({
         tag: 'table',
         attributes: { className: 'results-table' },
-        children: [tableHead, tableBody],
-      });
-
-      const configTitle = h({
-        tag: 'div',
-        attributes: { className: 'config-title' },
-        innerHTML: formatConfigString(configStr),
+        children: [tableCaption, tableHead, tableBody],
       });
 
       configSections.push(
         h({
           tag: 'div',
           attributes: { className: 'config-section' },
-          children: [configTitle, table],
+          children: [table],
         })
       );
     }
 
-    const testTitle = h({
-      tag: 'div',
-      attributes: { className: 'test-title' },
-      innerHTML: `<span class="test-number">${testIndex}.</span> ${testName}`,
-    });
-
-    const testContent = h({
-      tag: 'div',
-      attributes: { className: 'test-content' },
-      children: configSections,
-    });
-
     const testSection = h({
       tag: 'div',
       attributes: {
-        className: 'test-section',
+        className: 'test-card',
         'data-test-name': testName,
       },
-      children: [testTitle, testContent],
+      children: [
+        h({
+          tag: 'div',
+          attributes: { className: 'test-card-title' },
+          innerHTML: `<span class="test-number">${testIndex}.</span> ${testName}`,
+        }),
+        h({
+          tag: 'div',
+          attributes: { className: 'test-card-content' },
+          children: configSections,
+        }),
+      ],
     });
 
     resultsContent.push(testSection);
@@ -438,7 +445,10 @@ export const generateReport = () => {
     configToGroup.forEach((group, configStr) => {
       const suggestItems: PseudoElement[] = [];
 
-      group.forEach(({ approach, time, ratio, extra, config }) => {
+      // 过滤掉extra方法，只取前三名
+      const filteredGroup = group.filter((item) => !item.extra).slice(0, 3);
+
+      filteredGroup.forEach(({ approach, time, ratio, extra, config }) => {
         const methodSpan = h({
           tag: 'span',
           attributes: {
@@ -506,14 +516,8 @@ export const generateReport = () => {
         children: [
           h({
             tag: 'div',
-            attributes: { className: 'suggest-card-left' },
-            children: [
-              h({
-                tag: 'div',
-                attributes: { className: 'suggest-card-title' },
-                innerHTML: `<span class="suggest-number">${suggestIndex}.</span> ${testName}`,
-              }),
-            ],
+            attributes: { className: 'suggest-card-title' },
+            innerHTML: `<span class="suggest-number">${suggestIndex}.</span> ${testName}`,
           }),
           h({
             tag: 'div',

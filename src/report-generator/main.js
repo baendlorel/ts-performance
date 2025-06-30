@@ -39,6 +39,22 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
+// 添加快捷键支持
+document.addEventListener('keydown', function (e) {
+  if (e.ctrlKey || e.metaKey) {
+    switch (e.key) {
+      case 'e':
+        e.preventDefault();
+        toggleAllSections(false);
+        break;
+      case 'c':
+        e.preventDefault();
+        toggleAllSections(true);
+        break;
+    }
+  }
+});
+
 function initTabs() {
   // 默认显示第一个标签页（Results）
   const firstTab = document.querySelector('.tab-btn');
@@ -91,69 +107,6 @@ function toggleAllSections(collapse) {
   });
 }
 
-// 添加表格排序功能
-function addTableSorting() {
-  $('.results-table').forEach((table) => {
-    const headers = table.querySelectorAll('th');
-    headers.forEach((header, index) => {
-      if (index > 0) {
-        // 不对Method列排序，只对Time和Ratio列排序
-        header.style.cursor = 'pointer';
-        header.style.userSelect = 'none';
-        header.title = 'Click to sort';
-        header.innerHTML += ' ↕️';
-        header.addEventListener('click', () => sortTable(table, index));
-      }
-    });
-  });
-}
-
-function sortTable(table, columnIndex) {
-  const tbody = table.querySelector('tbody');
-  const rows = Array.from(tbody.querySelectorAll('tr'));
-
-  rows.sort((a, b) => {
-    const aText = a.cells[columnIndex].textContent.trim();
-    const bText = b.cells[columnIndex].textContent.trim();
-
-    if (columnIndex === 1) {
-      // Time column
-      const aValue = parseFloat(aText.replace(' ms', ''));
-      const bValue = parseFloat(bText.replace(' ms', ''));
-      return aValue - bValue;
-    } else if (columnIndex === 2) {
-      // Ratio column
-      const aValue = parseFloat(aText.replace('x', ''));
-      const bValue = parseFloat(bText.replace('x', ''));
-      return aValue - bValue;
-    }
-    return 0;
-  });
-
-  rows.forEach((row) => tbody.appendChild(row));
-}
-
-// 页面加载完成后初始化所有功能
-setTimeout(() => {
-  addTableSorting();
-
-  // 添加快捷键支持
-  document.addEventListener('keydown', function (e) {
-    if (e.ctrlKey || e.metaKey) {
-      switch (e.key) {
-        case 'e':
-          e.preventDefault();
-          toggleAllSections(false);
-          break;
-        case 'c':
-          e.preventDefault();
-          toggleAllSections(true);
-          break;
-      }
-    }
-  });
-}, 100);
-
 function filterResults(searchTerm = '') {
   const term = searchTerm.toLowerCase();
 
@@ -162,7 +115,7 @@ function filterResults(searchTerm = '') {
     el.outerHTML = el.innerHTML;
   });
 
-  $('.test-section').forEach((section) => {
+  $('.test-card').forEach((section) => {
     const sectionRows = section.querySelectorAll('.results-table tbody tr');
     let hasVisibleRows = false;
 
@@ -212,7 +165,7 @@ function clearSearch() {
 // 导航功能
 function showAllTests() {
   // 显示所有测试
-  $('.test-section').forEach((section) => {
+  $('.test-card').forEach((section) => {
     section.classList.remove('hidden');
   });
 
@@ -233,7 +186,7 @@ function showTest(testName) {
   clearSearch();
 
   // 隐藏所有测试
-  $('.test-section').forEach((section) => {
+  $('.test-card').forEach((section) => {
     if (section.getAttribute('data-test-name') === testName) {
       section.classList.remove('hidden');
     } else {

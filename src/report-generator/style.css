@@ -223,14 +223,16 @@ body {
   font-weight: 500;
 }
 .results-table {
-  width: 100%;
-  border-collapse: collapse;
   margin-bottom: 20px;
+  width: 100%;
+  text-align: center;
+  border-collapse: collapse;
+}
+.results-table caption {
 }
 .results-table th {
   background: #e9ecef;
-  padding: 14px; /* 从12px增大 */
-  text-align: left;
+  padding: 10px 14px; /* 从12px增大 */
   font-weight: 600;
   color: #495057;
   border-bottom: 2px solid #dee2e6;
@@ -244,7 +246,7 @@ body {
   background: #dee2e6;
 }
 .results-table td {
-  padding: 8px 14px; /* 从6px 12px增大 */
+  padding: 8px 0px; /* 从6px 12px增大 */
   border-bottom: 1px solid #dee2e6;
   font-size: 1.02em; /* 新增 */
 }
@@ -252,11 +254,11 @@ body {
   background: #f8f9fa;
 }
 .approach-name {
+  font-family: 'Consolas';
   font-weight: 500;
 }
 .time-value {
-  font-family: 'Courier New', monospace;
-  font-weight: 600;
+  font-family: 'Consolas';
 }
 .ratio-badge {
   padding: 5px 10px; /* 从4px 8px增大 */
@@ -295,7 +297,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin: 8px;
   padding-bottom: 6px;
   border-bottom: 1px solid #e9ecef;
   gap: 12px;
@@ -304,6 +306,14 @@ body {
 .suggest-item .suggest-approach {
   flex: 1;
   min-width: 0;
+}
+
+.suggest-item:first .suggest-approach {
+  font-weight: bold;
+}
+
+.suggest-item:first .suggest-approach::before {
+  content: '🥇';
 }
 
 .suggest-item .avg-time {
@@ -406,7 +416,7 @@ body {
   min-width: 0; /* 防止flex子项溢出 */
 }
 
-.test-section.hidden,
+.test-card.hidden,
 .suggest-card.hidden {
   display: none;
 }
@@ -415,23 +425,16 @@ body {
 .test-number,
 .nav-number,
 .suggest-number {
-  color: #6c757d;
-  font-weight: 500;
   margin-right: 8px;
-}
-
-.test-title .test-number {
-  font-size: 0.9em;
+  font-size: 18px;
+  font-weight: 500;
+  color: #6c757d;
 }
 
 .nav-item .nav-number {
   font-size: 0.85em;
   display: inline-block;
   min-width: 20px;
-}
-
-.suggest-card-title .suggest-number {
-  font-size: 0.9em;
 }
 
 /* 建议页面config和item的改进样式 */
@@ -461,31 +464,55 @@ body {
   margin-bottom: 6px;
 }
 
-/* 建议卡片布局 */
+/* 统一卡片样式 */
+.test-card,
 .suggest-card {
   background: white;
   border: 1px solid #dee2e6;
-  border-radius: 8px;
+  border-radius: 12px;
   margin-bottom: 20px;
-  padding: 12px 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  gap: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  gap: 24px;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
 }
 
+.suggest-card {
+  display: flex;
+}
+
+.test-card:hover,
+.suggest-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.test-card-left,
 .suggest-card-left {
-  flex: 0 0 200px; /* 固定宽度 */
+  flex: 0 0 220px; /* 固定宽度 */
   min-width: 0;
 }
 
+.test-card-right,
 .suggest-card-right {
   flex: 1;
   min-width: 0;
 }
 
+.test-card-title,
 .suggest-card-title {
-  font-size: 1.2em;
-  font-weight: 600;
-  color: #495057;
-  margin-bottom: 10px;
+  padding: 12px 16px;
+  font-size: 1.3em;
+  font-weight: 700;
+  color: #2c3e50;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-left: 5px solid #007bff;
+}
+.test-card-title {
+  border-radius: 12px 12px 0px 0px;
+  border-bottom: 1px solid #dee2e6;
+}
+.suggest-card-title {
+  min-width: 270px;
+  border-radius: 12px 0px 0px 12px;
+  border-right: 1px solid #dee2e6;
 }
