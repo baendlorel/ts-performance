@@ -1,4 +1,4 @@
-import { createMeasure } from '@/core';
+import { measure } from '@/core';
 
 /**
  * 对象遍历性能测试
@@ -34,53 +34,54 @@ import { createMeasure } from '@/core';
  * - Reflect.ownKeys + for: 1.233s
  * - map.foreach: 32.209ms
  */
-const measure = createMeasure('Object Iteration');
-const RUN_TIME = 1_000;
-const OBJ_SIZE = 100;
-const obj: Record<string, number> = {};
-const map = new Map<string, number>();
+measure.createTest('Object Iteration', () => {
+  const RUN_TIME = 1_000;
+  const OBJ_SIZE = 100;
+  const obj: Record<string, number> = {};
+  const map = new Map<string, number>();
 
-measure.addConfig({ RUN_TIME, OBJ_SIZE });
+  measure.addConfig({ RUN_TIME, OBJ_SIZE });
 
-// 构造大对象
-for (let i = 0; i < OBJ_SIZE; i++) {
-  obj['key' + i] = i;
-  map.set('key' + i, i);
-}
+  // 构造大对象
+  for (let i = 0; i < OBJ_SIZE; i++) {
+    obj['key' + i] = i;
+    map.set('key' + i, i);
+  }
 
-measure.add('for...in + hasOwnProperty', () => {
-  for (const key in obj) {
-    if (Object.prototype.hasOwnProperty.call(obj, key)) {
-      const val = obj[key];
+  measure.add('for...in + hasOwnProperty', () => {
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const val = obj[key];
+      }
     }
-  }
-});
+  });
 
-measure.add('Object.keys + for', () => {
-  const keys = Object.keys(obj);
-  for (let j = 0; j < keys.length; j++) {
-    const val = obj[keys[j]];
-  }
-});
+  measure.add('Object.keys + for', () => {
+    const keys = Object.keys(obj);
+    for (let j = 0; j < keys.length; j++) {
+      const val = obj[keys[j]];
+    }
+  });
 
-measure.add('Object.entries + for', () => {
-  const entries = Object.entries(obj);
-  for (let j = 0; j < entries.length; j++) {
-    const [key, val] = entries[j];
-  }
-});
+  measure.add('Object.entries + for', () => {
+    const entries = Object.entries(obj);
+    for (let j = 0; j < entries.length; j++) {
+      const [key, val] = entries[j];
+    }
+  });
 
-measure.add('Reflect.ownKeys + for', () => {
-  const keys = Reflect.ownKeys(obj);
-  for (let j = 0; j < keys.length; j++) {
-    const val = (obj as any)[keys[j]];
-  }
-});
+  measure.add('Reflect.ownKeys + for', () => {
+    const keys = Reflect.ownKeys(obj);
+    for (let j = 0; j < keys.length; j++) {
+      const val = (obj as any)[keys[j]];
+    }
+  });
 
-measure.extra('map.forEach', () => {
-  map.forEach((v, k) => {
-    const val = v; // 这里可以使用 k 或 v
-    const key = k;
+  measure.extra('map.forEach', () => {
+    map.forEach((v, k) => {
+      const val = v; // 这里可以使用 k 或 v
+      const key = k;
+    });
   });
 });
 

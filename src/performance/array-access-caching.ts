@@ -1,4 +1,4 @@
-import { createMeasure } from '@/core';
+import { measure } from '@/core';
 
 /**
  * 数组访问缓存性能测试
@@ -14,24 +14,25 @@ import { createMeasure } from '@/core';
  * - direct: 20.932ms
  * - cached: 7.768ms
  */
-const measure = createMeasure('Array Access');
-const ARRAY_SIZE = 1000000;
-const arr = Array.from({ length: ARRAY_SIZE }, (_, i) => i);
-measure.addConfig({ ARRAY_SIZE });
+measure.createTest('Array Access', () => {
+  const ARRAY_SIZE = 1000000;
+  const arr = Array.from({ length: ARRAY_SIZE }, (_, i) => i);
+  measure.addConfig({ ARRAY_SIZE });
 
-measure.add('const a = arr[i]', () => {
-  let s = 0;
-  for (let i = 0; i < arr.length; i++) {
-    const a = arr[i];
-    s += a * 2;
-  }
-});
+  measure.add('const a = arr[i]', () => {
+    let s = 0;
+    for (let i = 0; i < arr.length; i++) {
+      const a = arr[i];
+      s += a * 2;
+    }
+  });
 
-measure.add('arr[i]', () => {
-  let sum1 = 0;
-  for (let i = 0; i < arr.length; i++) {
-    sum1 += arr[i] * 2;
-  }
+  measure.add('arr[i]', () => {
+    let sum1 = 0;
+    for (let i = 0; i < arr.length; i++) {
+      sum1 += arr[i] * 2;
+    }
+  });
 });
 
 export {};

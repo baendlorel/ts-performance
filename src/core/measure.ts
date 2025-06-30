@@ -38,6 +38,7 @@ class Measure {
 
   static run() {
     const running = chalk.yellowBright('Running');
+    console.log(Measure.tasks.length, 'tasks');
     for (const t of Measure.tasks) {
       if (Measure.noFocusedTask || t.focused) {
         const testName = chalk.rgb(255, 165, 0)(t.testName);
