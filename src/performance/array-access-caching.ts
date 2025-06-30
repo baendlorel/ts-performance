@@ -20,7 +20,7 @@ export default function () {
   const arr = Array.from({ length: ARRAY_SIZE }, (_, i) => i);
   measure.setConfig({ ARRAY_SIZE });
 
-  measure.run('const a = arr[i]', () => {
+  measure.addTask('const a = arr[i]', () => {
     let s = 0;
     for (let i = 0; i < arr.length; i++) {
       const a = arr[i];
@@ -28,7 +28,7 @@ export default function () {
     }
   });
 
-  measure.run('arr[i]', () => {
+  measure.addTask('arr[i]', () => {
     let sum1 = 0;
     for (let i = 0; i < arr.length; i++) {
       sum1 += arr[i] * 2;

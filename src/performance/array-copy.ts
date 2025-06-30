@@ -29,18 +29,18 @@ export default function () {
 
   measure.setConfig({ RUN_TIME, ARRAY_SIZE });
 
-  measure.run('slice()', () => arr.slice());
-  measure.run('[...old]', () => [...arr]);
-  measure.run('concat()', () => arr.concat());
-  measure.run('Array.from()', () => Array.from(arr));
-  measure.run('for a[i] = old[i]', () => {
+  measure.addTask('slice()', () => arr.slice());
+  measure.addTask('[...old]', () => [...arr]);
+  measure.addTask('concat()', () => arr.concat());
+  measure.addTask('Array.from()', () => Array.from(arr));
+  measure.addTask('for a[i] = old[i]', () => {
     const a = [] as any[];
     for (let i = 0; i < arr.length; i++) {
       a[i] = arr[i];
     }
     return a;
   });
-  measure.run('for a.push(old[i])', () => {
+  measure.addTask('for a.push(old[i])', () => {
     const a = [] as any[];
     for (let i = 0; i < arr.length; i++) {
       a.push(arr[i]);

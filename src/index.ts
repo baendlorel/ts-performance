@@ -6,7 +6,7 @@
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import chalk from 'chalk';
-import { displayResults, displaySuggests } from './core';
+import { displayResults, displaySuggests, run } from './core';
 
 async function runAllTests() {
   const title = chalk.blueBright('TypeScript Performance Test');
@@ -27,6 +27,7 @@ async function runAllTests() {
     console.timeEnd(label);
   }
   console.timeEnd(`${Running} total`);
+  run();
   console.log();
   displayResults();
   console.log();

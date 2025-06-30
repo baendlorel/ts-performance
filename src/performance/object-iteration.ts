@@ -49,7 +49,7 @@ export default function () {
     map.set('key' + i, i);
   }
 
-  measure.run('for...in + hasOwnProperty', () => {
+  measure.addTask('for...in + hasOwnProperty', () => {
     for (const key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
         const val = obj[key];
@@ -57,28 +57,28 @@ export default function () {
     }
   });
 
-  measure.run('Object.keys + for', () => {
+  measure.addTask('Object.keys + for', () => {
     const keys = Object.keys(obj);
     for (let j = 0; j < keys.length; j++) {
       const val = obj[keys[j]];
     }
   });
 
-  measure.run('Object.entries + for', () => {
+  measure.addTask('Object.entries + for', () => {
     const entries = Object.entries(obj);
     for (let j = 0; j < entries.length; j++) {
       const [key, val] = entries[j];
     }
   });
 
-  measure.run('Reflect.ownKeys + for', () => {
+  measure.addTask('Reflect.ownKeys + for', () => {
     const keys = Reflect.ownKeys(obj);
     for (let j = 0; j < keys.length; j++) {
       const val = (obj as any)[keys[j]];
     }
   });
 
-  measure.extraRun('map.forEach', () => {
+  measure.extraTask('map.forEach', () => {
     map.forEach((v, k) => {
       const val = v; // 这里可以使用 k 或 v
       const key = k;

@@ -30,16 +30,16 @@ export default function () {
   const key = 'b';
   let sum = 0;
 
-  measure.run('obj[key]', () => {
+  measure.addTask('obj[key]', () => {
     sum += obj[key];
   });
 
-  measure.run('obj.key', () => {
+  measure.addTask('obj.key', () => {
     sum += obj.b;
   });
 
   sum = 0;
-  measure.run('Reflect.get(obj, key)', () => {
+  measure.addTask('Reflect.get(obj, key)', () => {
     sum += Reflect.get(obj, key);
   });
 }

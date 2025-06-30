@@ -47,13 +47,13 @@ export default function () {
     o[randStr(FILED_LEN)] = Math.random();
   }
 
-  measure.run('{...obj}', () => {
+  measure.addTask('{...obj}', () => {
     for (let i = 0; i < o.length; i++) {
       const a = { ...o[i] };
     }
   });
 
-  measure.run('Object.assign', () => {
+  measure.addTask('Object.assign', () => {
     for (let i = 0; i < o.length; i++) {
       const a = Object.assign({}, o[i]);
     }
@@ -62,7 +62,7 @@ export default function () {
   const g = Reflect.get;
   const s = Reflect.set;
   const ok = Reflect.ownKeys;
-  measure.run('Reflect.get/set/ownKeys', () => {
+  measure.addTask('Reflect.get/set/ownKeys', () => {
     for (let i = 0; i < o.length; i++) {
       const keys = ok(o[i]);
       const a = {};

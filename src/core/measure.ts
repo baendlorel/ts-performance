@@ -33,10 +33,23 @@ const formatNum2 = (n: string | number) => {
 
 const formatNum = formatNum2;
 
+type Task = {
+  config: Config;
+  fn: Function;
+  focused: boolean;
+
+  // keys
+  testName: string;
+  configAsLabel: string;
+  label: string;
+};
+
 class Measure {
   private testName: string;
   private config: Config = { RUN_TIME: 1 };
   private configAsLabel: string = '';
+  private static readonly tasks: Task[] = [];
+  private static noFocusedTask = true;
 
   constructor(testName: string) {
     this.testName = testName;
@@ -55,29 +68,57 @@ class Measure {
     this.configAsLabel = list.join(', ');
   }
 
-  run(label: string, fn: () => void) {
-    const start = performance.now();
-    for (let i = 1; i <= this.config.RUN_TIME; i++) {
-      fn();
+  static run() {
+    for (const t of Measure.tasks) {
+      if (Measure.noFocusedTask || t.focused) {
+        const start = performance.now();
+        for (let i = 1; i <= t.config.RUN_TIME; i++) {
+          t.fn();
+        }
+        const end = performance.now();
+        ReflectDeep.set(results, [t.testName, t.configAsLabel, t.label], {
+          time: end - start,
+          extra: false,
+        });
+      }
     }
-    const end = performance.now();
-    ReflectDeep.set(results, [this.testName, this.configAsLabel, `${label}`], {
-      time: end - start,
-      extra: false,
+  }
+
+  focusTask(label: string, fn: () => void) {
+    Measure.noFocusedTask = false;
+    Measure.tasks.push({
+      focused: true,
+      config: ReflectDeep.clone(this.config),
+      fn,
+      testName: this.testName,
+      configAsLabel: this.configAsLabel,
+      label,
     });
   }
 
-  extraRun(label: string, fn: () => void) {
+  addTask(label: string, fn: () => void) {
+    Measure.tasks.push({
+      focused: false,
+      config: ReflectDeep.clone(this.config),
+      fn,
+      testName: this.testName,
+      configAsLabel: this.configAsLabel,
+      label,
+    });
+  }
+
+  extraTask(label: string, fn: () => void) {
     const start = performance.now();
     for (let i = 1; i <= this.config.RUN_TIME; i++) {
       fn();
     }
     const end = performance.now();
-    ReflectDeep.set(results, [this.testName, this.configAsLabel, `${label}`], {
+    ReflectDeep.set(results, [this.testName, this.configAsLabel, label], {
       time: end - start,
       extra: true,
     });
   }
 }
 
+export const run = () => Measure.run();
 export const createMeasure = (testName: string) => new Measure(testName);

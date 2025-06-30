@@ -29,11 +29,11 @@ export default function () {
     obj['k' + i] = i;
   }
 
-  measure.run('in', () => {
+  measure.addTask('in', () => {
     'a' in obj;
   });
 
-  measure.run('Reflect.has', () => {
+  measure.addTask('Reflect.has', () => {
     Reflect.has(obj, 'a');
   });
 }

@@ -33,25 +33,25 @@ export default function () {
   const arr = Array.from({ length: ARRAY_SIZE }, (_, i) => i);
   measure.setConfig({ ARRAY_SIZE });
 
-  measure.run('for classic', () => {
+  measure.addTask('for classic', () => {
     for (let i = 0; i < arr.length; i++) {
       const x = arr[i] * 2;
     }
   });
 
-  measure.run('for...of', () => {
+  measure.addTask('for...of', () => {
     for (const val of arr) {
       const x = val * 2;
     }
   });
 
-  measure.run('for...in', () => {
+  measure.addTask('for...in', () => {
     for (const key in arr) {
       const x = arr[key] * 2;
     }
   });
 
-  measure.run('while', () => {
+  measure.addTask('while', () => {
     let i = 0;
     while (i < arr.length) {
       const x = arr[i] * 2;
@@ -59,7 +59,7 @@ export default function () {
     }
   });
 
-  measure.run('do...while', () => {
+  measure.addTask('do...while', () => {
     let i = 0;
     do {
       const x = arr[i] * 2;
@@ -67,17 +67,17 @@ export default function () {
     } while (i < arr.length);
   });
 
-  measure.run('forEach', () => {
+  measure.addTask('forEach', () => {
     arr.forEach((val) => {
       const x = val * 2;
     });
   });
 
-  measure.run('map', () => {
+  measure.addTask('map', () => {
     arr.map((val) => val * 2);
   });
 
-  measure.run('reduce', () => {
+  measure.addTask('reduce', () => {
     arr.reduce((acc, val) => acc + val * 2, 0);
   });
 }
