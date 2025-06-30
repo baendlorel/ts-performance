@@ -54,9 +54,10 @@ const getColor = (ratio: number): { bgColor: string; textColor: string } => {
 
   const bgColor = `rgb(${r}, ${g}, ${b})`;
 
-  // 计算亮度并决定文字颜色
-  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-  const textColor = brightness > 150 ? '#000' : '#fff';
+  // 改进的亮度计算和文字颜色决策
+  const grayscale = Math.floor(r * 0.299 + g * 0.587 + b * 0.114);
+
+  const textColor = grayscale > 128 ? '#000' : '#fff';
 
   return { bgColor, textColor };
 };
@@ -99,7 +100,10 @@ const outputToHTML = (html: string) => {
   const dtm = formatDTForFilename();
   const outputPath = join(process.cwd(), 'reports', `id_${id}__${dtm}.html`);
   writeFileSync(outputPath, html, 'utf8');
-  console.log(chalk.yellowBright(`HTML report generated`), relative(process.cwd(), outputPath));
+  console.log(
+    chalk.yellowBright(`HTML Report Generated`),
+    chalk.green(relative(process.cwd(), outputPath))
+  );
 };
 
 // 生成HTML页面
@@ -203,7 +207,7 @@ export const generateReport = () => {
           className: 'tab-btn',
           onclick: "switchTab('results')",
         },
-        innerHTML: '📊 Performance Results',
+        innerHTML: '<span class="emoji">📊</span><span>Performance Results</span>',
       }),
       h({
         tag: 'button',
@@ -211,7 +215,7 @@ export const generateReport = () => {
           className: 'tab-btn',
           onclick: "switchTab('suggests')",
         },
-        innerHTML: '📋 Performance Suggestions',
+        innerHTML: '<span class="emoji">📋</span><span>Performance Suggestions</span>',
       }),
     ],
   });
@@ -340,7 +344,7 @@ export const generateReport = () => {
   }
 
   suggests.forEach((configToGroup, testName) => {
-    const testSuggests: PseudoElement[] = [];
+    const cardContent: PseudoElement[] = [];
 
     configToGroup.forEach((group, configStr) => {
       const suggestItems: PseudoElement[] = [];
@@ -378,32 +382,43 @@ export const generateReport = () => {
           attributes: { className: 'config-title' },
           innerHTML: formatConfigString(configStr),
         });
-        testSuggests.push(configTitle);
+        cardContent.push(configTitle);
       }
 
-      testSuggests.push(...suggestItems);
+      cardContent.push(...suggestItems);
     });
 
-    if (testSuggests.length > 0) {
-      const suggestTestTitle = h({
+    if (cardContent.length > 0) {
+      const suggestCard = h({
         tag: 'div',
-        attributes: { className: 'test-title' },
-        innerHTML: testName,
+        attributes: { className: 'suggest-card' },
+        children: [
+          h({
+            tag: 'div',
+            attributes: { className: 'suggest-card-left' },
+            children: [
+              h({
+                tag: 'div',
+                attributes: { className: 'suggest-card-title' },
+                innerHTML: testName,
+              }),
+            ],
+          }),
+          h({
+            tag: 'div',
+            attributes: { className: 'suggest-card-right' },
+            children: [
+              h({
+                tag: 'div',
+                attributes: { className: 'suggest-card-content' },
+                children: cardContent,
+              }),
+            ],
+          }),
+        ],
       });
 
-      const suggestConfigSection = h({
-        tag: 'div',
-        attributes: { className: 'config-section' },
-        children: testSuggests,
-      });
-
-      suggestsContent.push(
-        h({
-          tag: 'div',
-          attributes: { className: 'test-section' },
-          children: [suggestTestTitle, suggestConfigSection],
-        })
-      );
+      suggestsContent.push(suggestCard);
     }
   });
 
