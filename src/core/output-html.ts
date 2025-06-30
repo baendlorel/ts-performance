@@ -7,6 +7,20 @@ const stripAnsi = (str: string): string => {
   return str.replace(/\x1b\[[0-9;]*m/g, '');
 };
 
+// 格式化数字，添加千分位逗号
+const formatNumber = (num: number): string => {
+  return num.toLocaleString('en-US');
+};
+
+// 格式化配置字符串中的科学计数法数字
+const formatConfigString = (str: string): string => {
+  // 匹配科学计数法数字 (如 1e7, 2.5e6 等)
+  return str.replace(/(\d+(?:\.\d+)?)[eE]([+-]?\d+)/g, (match, base, exponent) => {
+    const num = parseFloat(match);
+    return formatNumber(num);
+  });
+};
+
 // 颜色计算函数，返回CSS颜色
 const getColor = (ratio: number): string => {
   const ln = Math.log(ratio);
@@ -57,9 +71,9 @@ export const generateReport = () => {
         }
         
         body {
-            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'SF Mono', 'Monaco', monospace;
+            font-family: 'Fira Code', 'Consolas', 'SF Mono', 'Monaco', monospace;
             font-weight: 500;
-            background: linear-gradient(135deg,rgb(102, 130, 254) 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 75%, #0f3460 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -109,6 +123,35 @@ export const generateReport = () => {
             font-weight: 600;
             color: #333;
             border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s ease;
+        }
+        
+        .test-title:hover {
+            background: #eeeeee;
+        }
+        
+        .toggle-icon {
+            font-size: 1.2rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .toggle-icon.expanded {
+            transform: rotate(90deg);
+        }
+        
+        .test-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .test-content.expanded {
+            max-height: 2000px;
         }
         
         .config-section {
@@ -127,6 +170,29 @@ export const generateReport = () => {
             margin-bottom: 10px;
             padding-left: 10px;
             border-left: 4px solid #2196F3;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s ease;
+        }
+        
+        .config-title:hover {
+            background: #f8f8f8;
+        }
+        
+        .config-content {
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .config-content.collapsed {
+            max-height: 0;
+        }
+        
+        .config-content.expanded {
+            max-height: 1000px;
         }
         
         .results-table {
@@ -197,11 +263,38 @@ export const generateReport = () => {
             border-radius: 8px;
         }
         
+        .suggests-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            margin-bottom: 20px;
+        }
+        
+        .suggests-header:hover h2 {
+            color: #1976D2;
+        }
+        
         .suggests h2 {
             color: #2196F3;
-            margin-bottom: 20px;
             font-size: 1.8rem;
             font-weight: 300;
+            margin: 0;
+            transition: color 0.2s ease;
+        }
+        
+        .suggests-content {
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .suggests-content.collapsed {
+            max-height: 0;
+        }
+        
+        .suggests-content.expanded {
+            max-height: 1500px;
         }
         
         .suggest-group {
@@ -252,7 +345,51 @@ export const generateReport = () => {
             border-top: 1px solid #e0e0e0;
             background: #fafafa;
         }
-    </style>`;
+    </style>
+    <script>
+        function toggleTest(element) {
+            const content = element.nextElementSibling;
+            const icon = element.querySelector('.toggle-icon');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.classList.remove('expanded');
+            } else {
+                content.classList.add('expanded');
+                icon.classList.add('expanded');
+            }
+        }
+        
+        function toggleConfig(element) {
+            const content = element.nextElementSibling;
+            const icon = element.querySelector('.toggle-icon');
+            
+            if (content.classList.contains('collapsed')) {
+                content.classList.remove('collapsed');
+                content.classList.add('expanded');
+                icon.classList.add('expanded');
+            } else {
+                content.classList.add('collapsed');
+                content.classList.remove('expanded');
+                icon.classList.remove('expanded');
+            }
+        }
+        
+        function toggleSuggests(element) {
+            const content = element.nextElementSibling;
+            const icon = element.querySelector('.toggle-icon');
+            
+            if (content.classList.contains('collapsed')) {
+                content.classList.remove('collapsed');
+                content.classList.add('expanded');
+                icon.classList.add('expanded');
+            } else {
+                content.classList.add('collapsed');
+                content.classList.remove('expanded');
+                icon.classList.remove('expanded');
+            }
+        }
+    </script>`;
   const len = Object.keys(results).length;
 
   const id = readdirSync(join(process.cwd(), 'reports')).length + 1;
@@ -280,7 +417,11 @@ export const generateReport = () => {
   for (const [testName, configToGroup] of Object.entries(results)) {
     html += `
             <div class="test-group">
-                <div class="test-title">${testName}</div>
+                <div class="test-title" onclick="toggleTest(this)">
+                    <span>${testName}</span>
+                    <span class="toggle-icon">▶</span>
+                </div>
+                <div class="test-content">
 `;
 
     // 准备建议数据
@@ -289,7 +430,11 @@ export const generateReport = () => {
     for (const [configStr, group] of Object.entries(configToGroup)) {
       html += `
                 <div class="config-section">
-                    <div class="config-title">${stripAnsi(configStr)}</div>
+                    <div class="config-title" onclick="toggleConfig(this)">
+                        <span>${formatConfigString(stripAnsi(configStr))}</span>
+                        <span class="toggle-icon expanded">▶</span>
+                    </div>
+                    <div class="config-content expanded">
                     <table class="results-table">
                         <thead>
                             <tr>
@@ -325,7 +470,9 @@ export const generateReport = () => {
         html += `
                             <tr ${isLeast ? 'class="fastest"' : ''}>
                                 <td><span class="method-name">${label}</span></td>
-                                <td><span class="time">${time.toFixed(3)}</span></td>
+                                <td><span class="time">${formatNumber(
+                                  parseFloat(time.toFixed(3))
+                                )}</span></td>
                                 <td><span class="ratio" style="background-color: ${color}">${ratio.toFixed(
           2
         )}x</span></td>
@@ -339,19 +486,26 @@ export const generateReport = () => {
       html += `
                         </tbody>
                     </table>
+                    </div>
                 </div>
 `;
     }
 
     html += `
+                </div>
             </div>
+        </div>
 `;
   }
 
   // 生成建议部分
   html += `
             <div class="suggests">
-                <h2>Performance Suggestions</h2>
+                <div class="suggests-header" onclick="toggleSuggests(this)">
+                    <h2>Performance Suggestions</h2>
+                    <span class="toggle-icon expanded">▶</span>
+                </div>
+                <div class="suggests-content expanded">
 `;
 
   suggests.forEach((configToGroup, testName) => {
@@ -363,7 +517,9 @@ export const generateReport = () => {
     configToGroup.forEach((group, configStr) => {
       if (configToGroup.size > 1) {
         html += `
-                    <div class="suggest-config">${stripAnsi(configStr)}</div>
+                    <div class="suggest-config">${formatConfigString(
+                      stripAnsi(configStr)
+                    )}</div>
 `;
       }
 

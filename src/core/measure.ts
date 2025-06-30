@@ -32,29 +32,9 @@ class Measure {
   private static readonly tasks: Task[] = [];
   private static noFocusedTask = true;
 
-  private testName: string;
-  private configs: Config[] = [];
-
-  constructor(testName: string) {
-    this.testName = testName;
-  }
-
-  addConfig(config: Partial<Config>) {
-    const newConfig = Object.assign({ RUN_TIME: 1 }, config) as Config;
-    const label: string[] = [
-      `${chalk.blueBright('RUN_TIME')}: ${chalk.cyanBright(
-        formatNum(newConfig.RUN_TIME)
-      )}`,
-    ];
-    for (const k in newConfig) {
-      if (k === 'RUN_TIME') {
-        continue;
-      }
-      label.push(`${k}: ${chalk.cyanBright(formatNum(newConfig[k]))}`);
-    }
-    newConfig[CONFIG_LABEL] = label.join(', ');
-    this.configs.push(newConfig);
-  }
+  private testName: string = '';
+  private readonly configs: Config[] = [];
+  private readonly tasks: Task[] = [];
 
   static run() {
     const running = chalk.yellowBright('Running');
@@ -79,8 +59,13 @@ class Measure {
     }
   }
 
-  addTask(opts: { label: string; extra: boolean; focus: boolean; fn: () => void }) {
-    Measure.tasks.push({
+  private addTask(opts: {
+    label: string;
+    extra: boolean;
+    focus: boolean;
+    fn: () => void;
+  }) {
+    this.tasks.push({
       configs: this.configs,
       fn: opts.fn,
       focused: opts.focus,
@@ -90,6 +75,42 @@ class Measure {
     });
   }
 
+  private prepare(opts: { testName: string; fn: () => void; focus: boolean }) {
+    this.testName = opts.testName;
+    this.tasks.length = 0; // clear previous tasks
+    opts.fn();
+    if (opts.focus) {
+      Measure.noFocusedTask = true;
+      this.tasks.forEach((t) => (t.focused = true));
+    }
+    Measure.tasks.push(...this.tasks);
+  }
+
+  createTest(testName: string, fn: () => void) {
+    this.prepare({ testName, fn, focus: false });
+  }
+
+  focusTest(testName: string, fn: () => void) {
+    this.prepare({ testName, fn, focus: true });
+  }
+
+  addConfig(config: Partial<Config>) {
+    const newConfig = Object.assign({ RUN_TIME: 1 }, config) as Config;
+    const label: string[] = [
+      `${chalk.blueBright('RUN_TIME')}: ${chalk.cyanBright(
+        formatNum(newConfig.RUN_TIME)
+      )}`,
+    ];
+    for (const k in newConfig) {
+      if (k === 'RUN_TIME') {
+        continue;
+      }
+      label.push(`${k}: ${chalk.cyanBright(formatNum(newConfig[k]))}`);
+    }
+    newConfig[CONFIG_LABEL] = label.join(', ');
+    this.configs.push(newConfig);
+  }
+
   add(label: string, fn: () => void) {
     this.addTask({ label, extra: false, focus: false, fn });
   }
@@ -97,12 +118,7 @@ class Measure {
   extra(label: string, fn: () => void) {
     this.addTask({ label, extra: true, focus: false, fn });
   }
-
-  focus(label: string, fn: () => void) {
-    Measure.noFocusedTask = false;
-    this.addTask({ label, extra: false, focus: true, fn });
-  }
 }
 
 export const run = () => Measure.run();
-export const createMeasure = (testName: string) => new Measure(testName);
+export const measure = new Measure();
