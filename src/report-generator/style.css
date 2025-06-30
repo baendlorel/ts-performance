@@ -214,7 +214,7 @@ body {
   max-height: 0;
 }
 .config-section {
-  padding: 20px;
+  padding: 0px 20px;
 }
 .config-title {
   font-size: 1.2em; /* 从1.1em增大 */
@@ -228,8 +228,20 @@ body {
   text-align: center;
   border-collapse: collapse;
 }
-.results-table caption {
+.results-table .test-config-caption {
+  text-align: left;
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #6c757d;
+  padding: 10px 0px 6px 0px;
+  border-bottom: 1px solid #e9ecef;
+  caption-side: top;
 }
+.results-table .config-label {
+  border-left: 4px solid #b9dcff;
+  padding-left: 10px;
+}
+
 .results-table th {
   background: #e9ecef;
   padding: 10px 14px; /* 从12px增大 */
@@ -239,10 +251,10 @@ body {
   position: relative;
   font-size: 1.05em; /* 新增 */
 }
-.results-table th:nth-child(n + 2) {
+.results-table th {
   transition: background-color 0.2s ease;
 }
-.results-table th:nth-child(n + 2):hover {
+.results-table th:hover {
   background: #dee2e6;
 }
 .results-table td {
@@ -308,12 +320,13 @@ body {
   min-width: 0;
 }
 
-.suggest-item:first .suggest-approach {
+.suggest-item:first-child .suggest-approach {
   font-weight: bold;
 }
 
-.suggest-item:first .suggest-approach::before {
-  content: '🥇';
+.suggest-item:first-child .suggest-approach::after {
+  content: '🥇 ';
+  margin: 0px 4px;
 }
 
 .suggest-item .avg-time {

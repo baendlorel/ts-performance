@@ -326,7 +326,16 @@ export const generateReport = () => {
 
       const tableCaption = h({
         tag: 'caption',
-        innerHTML: formatConfigString(configStr),
+        attributes: {
+          className: 'test-config-caption',
+        },
+        children: [
+          h({
+            tag: 'span',
+            attributes: { className: 'config-label' },
+            innerHTML: formatConfigString(configStr),
+          }),
+        ],
       });
 
       const tableHead = h({
