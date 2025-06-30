@@ -180,7 +180,7 @@ export const generateReport = () => {
               type: 'text',
               id: 'searchInput',
               className: 'search-input',
-              placeholder: 'Search methods...',
+              placeholder: 'Filter approaches...',
             },
           }),
           h({
@@ -222,6 +222,19 @@ export const generateReport = () => {
 
   // 创建主要内容
   const resultsContent: PseudoElement[] = [];
+  const navigationItems: PseudoElement[] = [];
+
+  // 添加"显示全部"导航项
+  navigationItems.push(
+    h({
+      tag: 'div',
+      attributes: {
+        className: 'nav-item active',
+        onclick: 'showAllTests()',
+      },
+      innerHTML: '📊 Show All Tests',
+    })
+  );
 
   for (const [testName, configToGroup] of Object.entries(results)) {
     const configSections: PseudoElement[] = [];
@@ -320,14 +333,50 @@ export const generateReport = () => {
       children: configSections,
     });
 
-    resultsContent.push(
+    const testSection = h({
+      tag: 'div',
+      attributes: {
+        className: 'test-section',
+        'data-test-name': testName,
+      },
+      children: [testTitle, testContent],
+    });
+
+    resultsContent.push(testSection);
+
+    // 添加导航项
+    navigationItems.push(
       h({
         tag: 'div',
-        attributes: { className: 'test-section' },
-        children: [testTitle, testContent],
+        attributes: {
+          className: 'nav-item',
+          onclick: `showTest('${testName}')`,
+        },
+        innerHTML: testName,
       })
     );
   }
+
+  // 创建导航栏
+  const navigation = h({
+    tag: 'div',
+    attributes: { className: 'test-navigation' },
+    children: navigationItems,
+  });
+
+  // 创建结果容器
+  const resultsContainer = h({
+    tag: 'div',
+    attributes: { className: 'results-container' },
+    children: resultsContent,
+  });
+
+  // 创建带导航的内容区域
+  const resultsWithNav = h({
+    tag: 'div',
+    attributes: { className: 'results-with-nav' },
+    children: [navigation, resultsContainer],
+  });
 
   // 创建建议部分
   const suggestsContent: PseudoElement[] = [];
@@ -481,7 +530,7 @@ export const generateReport = () => {
       className: 'tab-content',
       id: 'results-content',
     },
-    children: [controlsContainer, ...resultsContent],
+    children: [controlsContainer, resultsWithNav],
   });
 
   // 创建 Suggests 标签页内容

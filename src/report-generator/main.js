@@ -212,3 +212,47 @@ function clearSearch() {
   document.getElementById('searchInput').value = '';
   filterResults('');
 }
+
+// 导航功能
+function showAllTests() {
+  // 显示所有测试
+  const testSections = document.querySelectorAll('.test-section');
+  testSections.forEach((section) => {
+    section.classList.remove('hidden');
+  });
+
+  // 更新导航项状态
+  const navItems = document.querySelectorAll('.nav-item');
+  navItems.forEach((item) => {
+    item.classList.remove('active');
+  });
+
+  // 激活"显示全部"项
+  const showAllItem = navItems[0]; // 第一个是"显示全部"
+  if (showAllItem) {
+    showAllItem.classList.add('active');
+  }
+}
+
+function showTest(testName) {
+  // 隐藏所有测试
+  const testSections = document.querySelectorAll('.test-section');
+  testSections.forEach((section) => {
+    if (section.getAttribute('data-test-name') === testName) {
+      section.classList.remove('hidden');
+    } else {
+      section.classList.add('hidden');
+    }
+  });
+
+  // 更新导航项状态
+  const navItems = document.querySelectorAll('.nav-item');
+  navItems.forEach((item) => {
+    item.classList.remove('active');
+    // 通过onclick属性判断是否为当前项
+    const onclick = item.getAttribute('onclick');
+    if (onclick && onclick.includes(JSON.stringify(testName))) {
+      item.classList.add('active');
+    }
+  });
+}

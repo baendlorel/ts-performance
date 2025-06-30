@@ -47,7 +47,13 @@ export class PseudoElement {
         }
       })
       .join(' ');
-    return `<${this.tag} id="${this.id}" ${attrs}>${innerHTML}</${this.tag}>`;
+
+    const html = `<${this.tag} id="${this.id}" ${attrs}>${innerHTML}</${this.tag}>`;
+    if (html.length > 50) {
+      return `<${this.tag} id="${this.id}" ${attrs}>\n  ${innerHTML}\n</${this.tag}>\n`;
+    } else {
+      return html;
+    }
   }
 }
 export const h = (args: PseudoElementConstructArgs) => new PseudoElement(args);
