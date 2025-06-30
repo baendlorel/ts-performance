@@ -127,10 +127,10 @@ export const generateReport = () => {
   }
 
   // 创建样式
-  const styles = readFileSync('style.css', 'utf-8');
+  const styles = readFileSync(join(__dirname, 'style.css'), 'utf-8');
 
   // JavaScript代码用于展开/折叠功能和标签页切换
-  const script = readFileSync('main.js', 'utf-8');
+  const script = readFileSync(join(__dirname, 'main.js'), 'utf-8');
 
   // 创建控制按钮
   const controlsContainer = h({

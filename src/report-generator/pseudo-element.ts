@@ -31,11 +31,6 @@ export class PseudoElement {
     return true;
   }
 
-  // 生成JavaScript代码来引用这个元素
-  jsRef(): string {
-    return `document.getElementById('${this.id}')`;
-  }
-
   toHTML(): string {
     const innerHTML =
       this.children.length > 0 ? this.children.map((c) => c.toHTML()).join('') : this.innerHTML;
