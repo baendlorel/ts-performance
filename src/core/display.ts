@@ -69,7 +69,13 @@ export const displayResults = () => {
         const ratioStr = color(ratio)(`${ratio.toFixed(2)}x`);
 
         if (ratio < 1.25) {
-          suggestMethods.push({ approach: label, time, ratio, extra: res.extra });
+          suggestMethods.push({
+            approach: label,
+            time,
+            ratio,
+            extra: res.extra,
+            config: res.config,
+          });
         }
 
         const msg =

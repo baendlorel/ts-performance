@@ -466,28 +466,11 @@ export const generateReport = () => {
           innerHTML: `<span class="avg-time-label">Avg:</span> ${avgTimeText}`,
         });
 
-        const suggestionContent = h({
-          tag: 'div',
-          attributes: { className: 'suggest-content' },
-          children: [
-            h({
-              tag: 'div',
-              attributes: { className: 'suggest-header' },
-              children: [methodSpan, ratioSpan],
-            }),
-            h({
-              tag: 'div',
-              attributes: { className: 'suggest-metrics' },
-              children: [avgTimeSpan],
-            }),
-          ],
-        });
-
         suggestItems.push(
           h({
             tag: 'div',
             attributes: { className: 'suggest-item' },
-            children: [suggestionContent],
+            children: [methodSpan, avgTimeSpan, ratioSpan],
           })
         );
       });

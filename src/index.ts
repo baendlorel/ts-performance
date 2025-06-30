@@ -9,6 +9,7 @@ import chalk from 'chalk';
 import { generateReport, run } from './core';
 
 async function runAllTests() {
+  console.time('✅ All tests completed successfully!');
   const title = chalk.blueBright('TypeScript Performance Test');
   console.log(`========= ${title} =========`);
   console.log();
@@ -25,13 +26,9 @@ async function runAllTests() {
   }
   console.timeEnd(`${prepareTitle} total`);
   run();
-  // console.log();
-  // displayResults();
-  // console.log();
-  // displaySuggests();
   console.log();
   generateReport();
   console.log();
-  console.log('✅ All tests completed successfully!');
+  console.timeEnd('✅ All tests completed successfully!');
 }
 runAllTests();

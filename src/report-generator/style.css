@@ -292,23 +292,26 @@ body {
   font-weight: 300;
 }
 .suggest-item {
-  display: block; /* 改为block */
-  padding: 12px 0;
-  border-bottom: 1px solid #f1f3f4;
-}
-.suggest-item:last-child {
-  border-bottom: none;
-}
-.suggest-content {
-  width: 100%;
-}
-.suggest-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
   padding-bottom: 6px;
   border-bottom: 1px solid #e9ecef;
+  gap: 12px;
+}
+
+.suggest-item .suggest-approach {
+  flex: 1;
+  min-width: 0;
+}
+
+.suggest-item .avg-time {
+  flex: 0 0 auto;
+}
+
+.suggest-item .ratio-badge {
+  flex: 0 0 auto;
 }
 .suggest-metrics {
   display: flex;
@@ -333,16 +336,6 @@ body {
   opacity: 0.8;
 }
 
-/* 调整原有的suggest-item样式 */
-.suggest-item {
-  display: block; /* 改为block */
-  padding: 12px 0;
-  border-bottom: 1px solid #f1f3f4;
-}
-
-.suggest-item:last-child {
-  border-bottom: none;
-}
 .footer {
   text-align: center;
   padding: 20px;
@@ -466,4 +459,33 @@ body {
 
 .suggest-config-group .suggest-item {
   margin-bottom: 6px;
+}
+
+/* 建议卡片布局 */
+.suggest-card {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  padding: 12px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 20px;
+}
+
+.suggest-card-left {
+  flex: 0 0 200px; /* 固定宽度 */
+  min-width: 0;
+}
+
+.suggest-card-right {
+  flex: 1;
+  min-width: 0;
+}
+
+.suggest-card-title {
+  font-size: 1.2em;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 10px;
 }
