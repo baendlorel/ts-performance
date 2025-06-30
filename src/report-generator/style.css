@@ -403,3 +403,21 @@ body {
 .test-section.hidden {
   display: none;
 }
+
+/* 测试序号样式 */
+.test-number,
+.nav-number {
+  color: #6c757d;
+  font-weight: 500;
+  margin-right: 8px;
+}
+
+.test-title .test-number {
+  font-size: 0.9em;
+}
+
+.nav-item .nav-number {
+  font-size: 0.85em;
+  display: inline-block;
+  min-width: 20px;
+}

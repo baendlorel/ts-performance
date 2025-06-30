@@ -236,7 +236,9 @@ export const generateReport = () => {
     })
   );
 
+  let testIndex = 0;
   for (const [testName, configToGroup] of Object.entries(results)) {
+    testIndex++;
     const configSections: PseudoElement[] = [];
 
     for (const [configStr, group] of Object.entries(configToGroup)) {
@@ -324,7 +326,7 @@ export const generateReport = () => {
     const testTitle = h({
       tag: 'div',
       attributes: { className: 'test-title' },
-      innerHTML: testName,
+      innerHTML: `<span class="test-number">${testIndex}.</span> ${testName}`,
     });
 
     const testContent = h({
@@ -352,7 +354,7 @@ export const generateReport = () => {
           className: 'nav-item',
           onclick: `showTest('${testName}')`,
         },
-        innerHTML: testName,
+        innerHTML: `<span class="nav-number">${testIndex}.</span> ${testName}`,
       })
     );
   }

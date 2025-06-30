@@ -157,7 +157,7 @@ setTimeout(() => {
   });
 }, 100);
 
-function filterResults(searchTerm) {
+function filterResults(searchTerm = '') {
   const testSections = document.querySelectorAll('.test-section');
   const term = searchTerm.toLowerCase();
 
@@ -210,7 +210,7 @@ function filterResults(searchTerm) {
 
 function clearSearch() {
   document.getElementById('searchInput').value = '';
-  filterResults('');
+  filterResults();
 }
 
 // 导航功能
@@ -235,6 +235,8 @@ function showAllTests() {
 }
 
 function showTest(testName) {
+  clearSearch();
+
   // 隐藏所有测试
   const testSections = document.querySelectorAll('.test-section');
   testSections.forEach((section) => {
