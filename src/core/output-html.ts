@@ -1,6 +1,11 @@
-import { writeFileSync } from 'fs';
+import { readdirSync, writeFileSync } from 'fs';
 import { results, suggests } from './result';
 import { join } from 'path';
+
+// 清理 ANSI 控制字符
+const stripAnsi = (str: string): string => {
+  return str.replace(/\x1b\[[0-9;]*m/g, '');
+};
 
 // 颜色计算函数，返回CSS颜色
 const getColor = (ratio: number): string => {
@@ -29,18 +34,22 @@ const getColor = (ratio: number): string => {
   }
 };
 
+function formatDateForFilename(date = new Date()) {
+  const pad = (n: number) => n.toString().padStart(2, '0');
+
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  const hour = pad(date.getHours());
+  const minute = pad(date.getMinutes());
+  const second = pad(date.getSeconds());
+
+  return `${year}-${month}-${day}_${hour}-${minute}-${second}`;
+}
+
 // 生成HTML页面
 export const generateReport = () => {
-  const len = Object.keys(results).length;
-
-  let html = `
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TypeScript Performance Report</title>
-    <style>
+  const style = ` <style>
         * {
             margin: 0;
             padding: 0;
@@ -48,8 +57,9 @@ export const generateReport = () => {
         }
         
         body {
-            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', monospace;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'SF Mono', 'Monaco', monospace;
+            font-weight: 500;
+            background: linear-gradient(135deg,rgb(102, 130, 254) 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -66,7 +76,7 @@ export const generateReport = () => {
         .header {
             background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
             color: white;
-            padding: 30px;
+            padding: 20px;
             text-align: center;
         }
         
@@ -82,7 +92,7 @@ export const generateReport = () => {
         }
         
         .content {
-            padding: 30px;
+            padding: 20px;
         }
         
         .test-group {
@@ -94,7 +104,7 @@ export const generateReport = () => {
         
         .test-title {
             background: #f5f5f5;
-            padding: 20px;
+            padding: 15px;
             font-size: 1.4rem;
             font-weight: 600;
             color: #333;
@@ -102,7 +112,7 @@ export const generateReport = () => {
         }
         
         .config-section {
-            padding: 20px;
+            padding: 15px;
             border-bottom: 1px solid #f0f0f0;
         }
         
@@ -114,7 +124,7 @@ export const generateReport = () => {
             font-size: 1.1rem;
             font-weight: 500;
             color: #666;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             padding-left: 10px;
             border-left: 4px solid #2196F3;
         }
@@ -127,7 +137,7 @@ export const generateReport = () => {
         
         .results-table th {
             background: #fafafa;
-            padding: 12px 15px;
+            padding: 8px 12px;
             text-align: left;
             font-weight: 600;
             color: #333;
@@ -135,7 +145,7 @@ export const generateReport = () => {
         }
         
         .results-table td {
-            padding: 12px 15px;
+            padding: 8px 12px;
             border-bottom: 1px solid #f0f0f0;
         }
         
@@ -167,7 +177,7 @@ export const generateReport = () => {
             font-weight: 600;
             padding: 4px 8px;
             border-radius: 4px;
-            color: white;
+            color: black;
             font-size: 0.9rem;
         }
         
@@ -181,8 +191,8 @@ export const generateReport = () => {
         }
         
         .suggests {
-            margin-top: 40px;
-            padding: 30px;
+            margin-top: 30px;
+            padding: 20px;
             background: #f8f9fa;
             border-radius: 8px;
         }
@@ -242,13 +252,25 @@ export const generateReport = () => {
             border-top: 1px solid #e0e0e0;
             background: #fafafa;
         }
-    </style>
+    </style>`;
+  const len = Object.keys(results).length;
+
+  const id = readdirSync(join(process.cwd(), 'reports')).length + 1;
+
+  let html = `
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeScript Performance Report</title>
+    ${style}
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>TypeScript Performance Report</h1>
-            <p>${len} Performance Tests • Time unit: milliseconds</p>
+            <h1>TypeScript Performance Report <small>ID: ${id}</small></h1>
+            <p>${len} Performance Tests • Time unit: ms</p>
         </div>
         
         <div class="content">
@@ -267,7 +289,7 @@ export const generateReport = () => {
     for (const [configStr, group] of Object.entries(configToGroup)) {
       html += `
                 <div class="config-section">
-                    <div class="config-title">${configStr}</div>
+                    <div class="config-title">${stripAnsi(configStr)}</div>
                     <table class="results-table">
                         <thead>
                             <tr>
@@ -341,7 +363,7 @@ export const generateReport = () => {
     configToGroup.forEach((group, configStr) => {
       if (configToGroup.size > 1) {
         html += `
-                    <div class="suggest-config">${configStr}</div>
+                    <div class="suggest-config">${stripAnsi(configStr)}</div>
 `;
       }
 
@@ -393,8 +415,10 @@ export const generateReport = () => {
 `;
 
   // 写入文件
-  const dt = new Date().toISOString().replace(/[:.]/g, '-');
-  const outputPath = join(process.cwd(), 'report', dt + '.html');
-  writeFileSync(outputPath, html, 'utf8');
-  console.log(`HTML report generated: ${outputPath}`);
+  {
+    const dtm = formatDateForFilename();
+    const outputPath = join(process.cwd(), 'reports', `id${id}_${dtm}.html`);
+    writeFileSync(outputPath, html, 'utf8');
+    console.log(`HTML report generated: ${outputPath}`);
+  }
 };
