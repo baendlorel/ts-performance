@@ -25,10 +25,10 @@ async function runAllTests() {
   }
   console.timeEnd(`${prepareTitle} total`);
   run();
-  console.log();
-  displayResults();
-  console.log();
-  displaySuggests();
+  // console.log();
+  // displayResults();
+  // console.log();
+  // displaySuggests();
   console.log();
   generateReport();
   console.log('✅ All tests completed successfully!');

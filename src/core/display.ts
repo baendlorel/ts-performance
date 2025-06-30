@@ -69,7 +69,7 @@ export const displayResults = () => {
         const ratioStr = color(ratio)(`${ratio.toFixed(2)}x`);
 
         if (ratio < 1.25) {
-          suggestMethods.push({ method: label, time, ratio, extra: res.extra });
+          suggestMethods.push({ approach: label, time, ratio, extra: res.extra });
         }
 
         const msg =
@@ -99,10 +99,10 @@ export const displaySuggests = () => {
         // Only display configStr if there are multiple configs
         console.log(SPACE, configStr);
       }
-      const maxLen = Math.max(...group.map(({ method }) => method.length));
-      group.forEach(({ method, time, ratio, extra }) => {
+      const maxLen = Math.max(...group.map(({ approach }) => approach.length));
+      group.forEach(({ approach, time, ratio, extra }) => {
         const padMethod = (extra ? chalk.magentaBright : chalk.yellowBright)(
-          method.padEnd(maxLen + 1, ' ')
+          approach.padEnd(maxLen + 1, ' ')
         );
         const ratioStr = color(ratio)(`${ratio.toFixed(2)}x`);
         const EX = extra ? chalk.bgMagenta('EX') : '';

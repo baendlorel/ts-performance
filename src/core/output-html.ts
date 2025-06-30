@@ -167,7 +167,12 @@ export const generateReport = () => {
       for (const [label, res] of arr) {
         const ratio = res.time / least.time;
         if (ratio < 1.25) {
-          suggestMethods.push({ method: label, time: res.time, ratio, extra: res.extra });
+          suggestMethods.push({
+            approach: label,
+            time: res.time,
+            ratio,
+            extra: res.extra,
+          });
         }
       }
     }
@@ -216,7 +221,7 @@ export const generateReport = () => {
     }
     .test-title { 
       background: #f8f9fa; 
-      padding: 20px; 
+      padding: 10px 20px; 
       font-size: 1.4em; 
       font-weight: 600; 
       color: #495057; 
@@ -279,13 +284,13 @@ export const generateReport = () => {
       background: #dee2e6;
     }
     .results-table td { 
-      padding: 10px 12px; 
+      padding: 6px 12px; 
       border-bottom: 1px solid #dee2e6; 
     }
     .results-table tr:hover { 
       background: #f8f9fa; 
     }
-    .method-name { 
+    .approach-name { 
       font-weight: 500; 
     }
     .time-value { 
@@ -310,7 +315,7 @@ export const generateReport = () => {
       background: #fff3cd !important; 
     }
     .best-result .ratio-badge {
-      /* 确保最佳结果的ratio badge也使用自动计算的文字颜色 */
+      color: #000 !important;
     }
     .suggests-section { 
       margin-top: 40px; 
@@ -330,7 +335,7 @@ export const generateReport = () => {
       align-items: center; 
       padding: 8px 0; 
     }
-    .suggest-method { 
+    .suggest-approach { 
       font-weight: 600; 
       margin-right: 15px; 
       min-width: 200px; 
@@ -396,10 +401,15 @@ export const generateReport = () => {
         // 将控制区域插入到content的第一个位置
         content.insertBefore(controlsDiv, content.firstChild);
         
-        const searchInput = document.getElementById('searchInput');
-        searchInput.addEventListener('input', function() {
-          filterResults(this.value);
-        });
+        // 重要：重新选择所有元素，因为DOM结构已经改变
+        setTimeout(() => {
+          const searchInput = document.getElementById('searchInput');
+          if (searchInput) {
+            searchInput.addEventListener('input', function() {
+              filterResults(this.value);
+            });
+          }
+        }, 10);
       }
     });
     
@@ -506,7 +516,7 @@ export const generateReport = () => {
             
             // 添加高亮
             if (term) {
-              const methodName = methodCell.querySelector('.method-name');
+              const methodName = methodCell.querySelector('.approach-name');
               if (methodName) {
                 const originalText = methodName.textContent;
                 const escapedTerm = term.replace(/[.*+?$^{}()|[\\]\\]/g, '\\\\$&');
@@ -553,7 +563,7 @@ export const generateReport = () => {
 
         const methodCell = h({
           tag: 'td',
-          innerHTML: `<span class="method-name">${label}</span>${
+          innerHTML: `<span class="approach-name">${label}</span>${
             res.extra ? '<span class="extra-badge">EX</span>' : ''
           }`,
         });
@@ -581,7 +591,7 @@ export const generateReport = () => {
       }
 
       const tableHeaders = [
-        h({ tag: 'th', innerHTML: 'Method' }),
+        h({ tag: 'th', innerHTML: 'Approach' }),
         h({ tag: 'th', innerHTML: 'Time' }),
         h({ tag: 'th', innerHTML: 'Ratio' }),
       ];
@@ -652,13 +662,13 @@ export const generateReport = () => {
     configToGroup.forEach((group, configStr) => {
       const suggestItems: PseudoElement[] = [];
 
-      group.forEach(({ method, time, ratio, extra }) => {
+      group.forEach(({ approach: approach, time, ratio, extra }) => {
         const methodSpan = h({
           tag: 'span',
           attributes: {
-            className: `suggest-method ${extra ? 'extra-method' : ''}`,
+            className: `suggest-approach ${extra ? 'extra-approach' : ''}`,
           },
-          innerHTML: `${method}${extra ? '<span class="extra-badge">EX</span>' : ''}`,
+          innerHTML: `${approach}${extra ? '<span class="extra-badge">EX</span>' : ''}`,
         });
 
         const { bgColor, textColor } = getColor(ratio);

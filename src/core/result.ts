@@ -7,6 +7,6 @@ export const suggests: Map<
   string, // 测试名称
   Map<
     string, // config字符串
-    { method: string; time: number; ratio: number; extra: boolean }[]
+    { approach: string; time: number; ratio: number; extra: boolean }[]
   >
 > = new Map();
