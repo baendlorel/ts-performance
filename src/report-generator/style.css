@@ -321,10 +321,12 @@ body {
 .suggest-item .suggest-approach {
   flex: 1;
   min-width: 0;
+  font-family: 'Consolas';
 }
 
 .suggest-item:first-child .suggest-approach {
   font-weight: bold;
+  color: #1e579e;
 }
 
 .suggest-item:first-child .suggest-approach::after {
@@ -355,6 +357,31 @@ body {
   font-size: 0.85em;
   font-weight: 500;
   border: 1px solid #bbdefb;
+}
+
+/* 不同时间单位的颜色变化 */
+.avg-time[unit='ns'] {
+  background: #e8f5e8;
+  color: #2e7d32;
+  border-color: #c8e6c8;
+}
+
+.avg-time[unit='μs'] {
+  background: #e1f4f3;
+  color: #00695c;
+  border-color: #b2dfdb;
+}
+
+.avg-time[unit='ms'] {
+  background: #e3f2fd;
+  color: #1565c0;
+  border-color: #bbdefb;
+}
+
+.avg-time[unit='s'] {
+  background: #fff8e1;
+  color: #e65100;
+  border-color: #ffcc02;
 }
 
 .avg-time-label {
@@ -518,9 +545,11 @@ body {
   cursor: pointer;
   user-select: none;
   position: relative;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
 }
-
+.test-card-title.collapsed {
+  border-radius: 12px 12px 12px 12px;
+}
 .test-card-title:hover {
   background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
 }
@@ -537,7 +566,6 @@ body {
 
 .test-card-title.collapsed::after {
   transform: translateY(-50%) rotate(-90deg);
-  border-radius: 12px 12px 12px 12px;
 }
 .test-card-title {
   border-radius: 12px 12px 0px 0px;

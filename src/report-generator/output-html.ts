@@ -6,21 +6,21 @@ import { results, suggests } from '@/core/result';
 import { h, PseudoElement } from './pseudo-element';
 
 // 格式化平均时间，自动选择合适的单位
-const formatAverageTime = (totalTime: number, runTime: number): string => {
+const formatAverageTime = (totalTime: number, runTime: number): { text: string; unit: string } => {
   const avgTime = totalTime / runTime; // 毫秒
 
   if (avgTime >= 1000) {
     // 大于等于1秒，显示秒
-    return `${(avgTime / 1000).toFixed(3)} s`;
+    return { text: `${(avgTime / 1000).toFixed(3)} s`, unit: 's' };
   } else if (avgTime >= 1) {
     // 大于等于1毫秒，显示毫秒
-    return `${avgTime.toFixed(3)} ms`;
+    return { text: `${avgTime.toFixed(3)} ms`, unit: 'ms' };
   } else if (avgTime >= 0.001) {
     // 大于等于1微秒，显示微秒
-    return `${(avgTime * 1000).toFixed(3)} μs`;
+    return { text: `${(avgTime * 1000).toFixed(3)} μs`, unit: 'μs' };
   } else {
     // 小于1微秒，显示纳秒
-    return `${(avgTime * 1000000).toFixed(0)} ns`;
+    return { text: `${(avgTime * 1000000).toFixed(0)} ns`, unit: 'ns' };
   }
 };
 
@@ -289,10 +289,10 @@ export const generateReport = () => {
 
         // 计算平均时间
         const runTime = res.config.RUN_TIME as number;
-        const avgTimeText = formatAverageTime(res.time, runTime);
+        const { text: avgTimeText, unit: avgTimeUnit } = formatAverageTime(res.time, runTime);
         const avgTimeCell = h({
           tag: 'td',
-          innerHTML: `<span class="avg-time">${avgTimeText}</span>`,
+          innerHTML: `<span class="avg-time" unit="${avgTimeUnit}">${avgTimeText}</span>`,
         });
 
         const { bgColor, textColor } = getColor(ratio);
@@ -480,11 +480,11 @@ export const generateReport = () => {
 
         // 计算平均时间
         const runTime = config.RUN_TIME as number;
-        const avgTimeText = formatAverageTime(time, runTime);
+        const { text: avgTimeText, unit: avgTimeUnit } = formatAverageTime(time, runTime);
 
         const avgTimeSpan = h({
           tag: 'span',
-          attributes: { className: 'avg-time' },
+          attributes: { className: 'avg-time', unit: avgTimeUnit },
           innerHTML: `<span class="avg-time-label">Avg:</span> ${avgTimeText}`,
         });
 
