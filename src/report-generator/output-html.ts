@@ -372,7 +372,10 @@ export const generateReport = () => {
       children: [
         h({
           tag: 'div',
-          attributes: { className: 'test-card-title' },
+          attributes: {
+            className: 'test-card-title',
+            onclick: 'toggleSection(this)',
+          },
           innerHTML: `<span class="test-number">${testIndex}.</span> ${testName}`,
         }),
         h({

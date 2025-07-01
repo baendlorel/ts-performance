@@ -309,10 +309,13 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 8px;
+  margin: 12px 10px;
   padding-bottom: 6px;
   border-bottom: 1px solid #e9ecef;
   gap: 12px;
+}
+.suggest-item:last-child {
+  border-bottom: none;
 }
 
 .suggest-item .suggest-approach {
@@ -344,6 +347,7 @@ body {
 }
 
 .avg-time {
+  font-family: 'Consolas';
   background: #e3f2fd;
   color: #1565c0;
   padding: 2px 8px;
@@ -455,14 +459,10 @@ body {
   font-size: 1.05em;
   color: #6c757d;
   margin-bottom: 8px; /* 减少下方间距 */
-  margin-top: 15px; /* 添加上方间距分隔 */
+  margin-top: 12px;
   font-weight: 600;
   border-bottom: 1px solid #e9ecef;
   padding-bottom: 5px;
-}
-
-.suggest-card-content .config-title:first-child {
-  margin-top: 0; /* 第一个config标题不需要上方间距 */
 }
 
 /* 为config相关的suggest items添加缩进和样式 */
@@ -471,10 +471,6 @@ body {
   border-left: 2px solid #e9ecef;
   padding-left: 15px;
   margin-bottom: 10px;
-}
-
-.suggest-config-group .suggest-item {
-  margin-bottom: 6px;
 }
 
 /* 统一卡片样式 */
@@ -519,6 +515,29 @@ body {
   color: #2c3e50;
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   border-left: 5px solid #007bff;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  transition: background-color 0.2s ease;
+}
+
+.test-card-title:hover {
+  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+}
+
+.test-card-title::after {
+  content: '▼';
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: all 0.3s ease;
+  font-size: 0.8em;
+}
+
+.test-card-title.collapsed::after {
+  transform: translateY(-50%) rotate(-90deg);
+  border-radius: 12px 12px 12px 12px;
 }
 .test-card-title {
   border-radius: 12px 12px 0px 0px;
@@ -528,4 +547,13 @@ body {
   min-width: 270px;
   border-radius: 12px 0px 0px 12px;
   border-right: 1px solid #dee2e6;
+}
+.test-card-content {
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  max-height: 2000px;
+}
+
+.test-card-content.collapsed {
+  max-height: 0;
 }

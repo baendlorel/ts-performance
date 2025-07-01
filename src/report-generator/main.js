@@ -37,6 +37,19 @@ document.addEventListener('DOMContentLoaded', function () {
       filterResults(this.value);
     });
   }
+
+  // 恢复卡片的折叠状态
+  $('.test-card-title').forEach((title) => {
+    const testName = title.parentElement.getAttribute('data-test-name');
+    const savedState = localStorage.getItem('collapse_card_' + testName);
+    if (savedState === 'true') {
+      title.classList.add('collapsed');
+      const content = title.nextElementSibling;
+      if (content && content.classList.contains('test-card-content')) {
+        content.classList.add('collapsed');
+      }
+    }
+  });
 });
 
 // 添加快捷键支持
@@ -91,6 +104,7 @@ function switchTab(tabName) {
 }
 
 function toggleAllSections(collapse) {
+  // 处理旧的test-title结构
   $('.test-title').forEach((title) => {
     const content = title.nextElementSibling;
     if (content && content.classList.contains('test-content')) {
@@ -103,6 +117,23 @@ function toggleAllSections(collapse) {
       }
       // 保存状态
       localStorage.setItem('collapse_' + title.id, collapse.toString());
+    }
+  });
+
+  // 处理新的卡片结构
+  $('.test-card-title').forEach((title) => {
+    const content = title.nextElementSibling;
+    if (content && content.classList.contains('test-card-content')) {
+      if (collapse) {
+        title.classList.add('collapsed');
+        content.classList.add('collapsed');
+      } else {
+        title.classList.remove('collapsed');
+        content.classList.remove('collapsed');
+      }
+      // 保存状态
+      const testName = title.parentElement.getAttribute('data-test-name');
+      localStorage.setItem('collapse_card_' + testName, collapse.toString());
     }
   });
 }
@@ -243,4 +274,18 @@ function showSuggest(testName) {
       item.classList.add('active');
     }
   });
+}
+
+// 卡片展开折叠功能
+function toggleSection(titleElement) {
+  const content = titleElement.nextElementSibling;
+  if (content && content.classList.contains('test-card-content')) {
+    titleElement.classList.toggle('collapsed');
+    content.classList.toggle('collapsed');
+
+    // 存储状态到localStorage
+    const testName = titleElement.parentElement.getAttribute('data-test-name');
+    const isCollapsed = titleElement.classList.contains('collapsed');
+    localStorage.setItem('collapse_card_' + testName, isCollapsed.toString());
+  }
 }
