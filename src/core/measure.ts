@@ -5,6 +5,7 @@ import { results } from './result';
 const CONFIG_LABEL = Symbol('config-label');
 type Config = Record<string, number | string> & {
   RUN_TIME: number;
+  ARRAY_SIZE: number;
   [CONFIG_LABEL]: string;
 };
 
@@ -47,7 +48,7 @@ class Measure {
         for (const config of t.configs) {
           const start = performance.now();
           for (let i = 1; i <= config.RUN_TIME; i++) {
-            t.fn();
+            t.fn(config);
           }
           const end = performance.now();
           ReflectDeep.set(results, [t.testName, config[CONFIG_LABEL], t.label], {
@@ -61,7 +62,12 @@ class Measure {
     }
   }
 
-  private addTask(opts: { label: string; extra: boolean; focus: boolean; fn: () => void }) {
+  private addTask(opts: {
+    label: string;
+    extra: boolean;
+    focus: boolean;
+    fn: (config: Config) => void;
+  }) {
     this.tasks.push({
       configs: this.configs,
       fn: opts.fn,
@@ -95,7 +101,7 @@ class Measure {
   }
 
   addConfig(config: Partial<Config>) {
-    const newConfig = Object.assign({ RUN_TIME: 1 }, config) as Config;
+    const newConfig = Object.assign({ RUN_TIME: 1, ARRAY_SIZE: 0 }, config) as Config;
     const label: string[] = [
       `${chalk.blueBright('RUN_TIME')}: ${chalk.cyanBright(formatNum(newConfig.RUN_TIME))}`,
     ];
@@ -103,17 +109,20 @@ class Measure {
       if (k === 'RUN_TIME') {
         continue;
       }
+      if (k === 'ARRAY_SIZE' && newConfig.ARRAY_SIZE === 0) {
+        continue; // skip if ARRAY_SIZE is not set
+      }
       label.push(`${k}: ${chalk.cyanBright(formatNum(newConfig[k]))}`);
     }
     newConfig[CONFIG_LABEL] = label.join(', ');
     this.configs.push(newConfig);
   }
 
-  add(label: string, fn: () => void) {
+  add(label: string, fn: (config: Config) => void) {
     this.addTask({ label, extra: false, focus: false, fn });
   }
 
-  extra(label: string, fn: () => void) {
+  extra(label: string, fn: (config: Config) => void) {
     this.addTask({ label, extra: true, focus: false, fn });
   }
 }
