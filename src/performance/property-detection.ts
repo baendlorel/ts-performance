@@ -18,7 +18,7 @@ import { measure } from '@/core';
  * - in: 3.35ms
  * - Reflect.has: 25.5ms
  */
-measure.createTest('Property detection', () => {
+measure.test('Property detection', () => {
   const RUN_TIME = 1e8;
   const OBJ_SIZE = 10;
   measure.addConfig({ RUN_TIME, OBJ_SIZE });

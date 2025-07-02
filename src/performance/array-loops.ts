@@ -27,7 +27,7 @@ import { measure } from '@/core';
  * - reduce              : 54.98ms
  * - Array.from + forEach: 50.18ms
  */
-measure.createTest('Array Loops', () => {
+measure.test('Array Loops', () => {
   const ARRAY_SIZE = 10_000_000;
   const arr = Array.from({ length: ARRAY_SIZE }, (_, i) => i);
   measure.addConfig({ ARRAY_SIZE });

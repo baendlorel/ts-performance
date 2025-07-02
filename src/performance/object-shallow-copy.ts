@@ -24,7 +24,7 @@ import { measure } from '@/core';
  * - Object.assign: 2.889s
  * - Reflect.get/set/ownKeys: 2.625s
  */
-measure.createTest('Object Shallow Copy', () => {
+measure.test('Object Shallow Copy', () => {
   const chars = '_-+=#@&$ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const randStr = (length: number) => {
     let result = '';

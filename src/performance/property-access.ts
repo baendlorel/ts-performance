@@ -16,7 +16,7 @@ import { measure } from '@/core';
  * - dot: 376.09ms
  * - reflect: 330.358ms (不明原因比10个属性还要快)
  */
-measure.createTest('Property Access', () => {
+measure.test('Property Access', () => {
   const RUN_TIME = 1e6;
   const OBJ_SIZE = 1000;
   measure.addConfig({ RUN_TIME, OBJ_SIZE });

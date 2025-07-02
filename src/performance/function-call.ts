@@ -1,6 +1,6 @@
 import { measure } from '@/core';
 
-measure.createTest('Function Call', () => {
+measure.test('Function Call', () => {
   measure.addConfig({ RUN_TIME: 10 });
   measure.addConfig({ RUN_TIME: 1000 });
   measure.addConfig({ RUN_TIME: 1000000 });

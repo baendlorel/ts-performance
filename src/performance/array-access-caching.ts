@@ -14,7 +14,7 @@ import { measure } from '@/core';
  * - direct: 20.932ms
  * - cached: 7.768ms
  */
-measure.createTest('Array Access', () => {
+measure.test('Array Access', () => {
   const ARRAY_SIZE = 100000;
   const arr = Array.from({ length: ARRAY_SIZE }, (_, i) => i);
   measure.addConfig({ ARRAY_SIZE });

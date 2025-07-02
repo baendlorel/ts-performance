@@ -21,7 +21,7 @@ import { measure } from '@/core';
  * - for set: 53.17 ms
  * - for push: 55.54 ms
  */
-measure.createTest('Array Copy', () => {
+measure.test('Array Copy', () => {
   const RUN_TIME = 1000;
   const ARRAY_SIZE = 10000;
   const arr = Array(ARRAY_SIZE).fill(1);

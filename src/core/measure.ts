@@ -86,11 +86,11 @@ class Measure {
     Measure.tasks.push(...this.tasks);
   }
 
-  createTest(testName: string, fn: () => void) {
+  test(testName: string, fn: () => void) {
     this.prepare({ testName, fn, focus: false });
   }
 
-  focusTest(testName: string, fn: () => void) {
+  ftest(testName: string, fn: () => void) {
     this.prepare({ testName, fn, focus: true });
   }
 

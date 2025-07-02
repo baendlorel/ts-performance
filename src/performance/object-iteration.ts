@@ -34,7 +34,7 @@ import { measure } from '@/core';
  * - Reflect.ownKeys + for: 1.233s
  * - map.foreach: 32.209ms
  */
-measure.createTest('Object Iteration', () => {
+measure.test('Object Iteration', () => {
   const RUN_TIME = 1_000;
   const OBJ_SIZE = 100;
   const obj: Record<string, number> = {};
