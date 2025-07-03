@@ -1,9 +1,8 @@
+import { FullConfig } from './measure';
+
 export const results = {} as Record<
   string,
-  Record<
-    string,
-    Record<string, { time: number; extra: boolean; config: Record<string, number | string> }>
-  >
+  Record<string, Record<string, { time: number; extra: boolean; config: FullConfig }>>
 >;
 
 export const suggests: Map<
@@ -15,7 +14,7 @@ export const suggests: Map<
       time: number;
       ratio: number;
       extra: boolean;
-      config: Record<string, number | string>;
+      config: FullConfig;
     }[]
   >
 > = new Map();

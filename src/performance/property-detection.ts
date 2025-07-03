@@ -19,7 +19,7 @@ import { measure } from '@/core';
  * - Reflect.has: 25.5ms
  */
 measure.test('Property detection', () => {
-  measure.addConfig({ runTime: 1e8, size: 10 }, (config) => {
+  measure.addConfig({ runTime: 1e4, size: 1000 }, (config) => {
     const o = { a: 1, b: 2, c: 3 } as any;
     for (let i = 0; i < config.size; i++) {
       o['k' + i] = i;

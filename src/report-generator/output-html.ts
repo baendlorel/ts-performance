@@ -11,16 +11,16 @@ const formatAverageTime = (totalTime: number, runTime: number): { text: string; 
 
   if (avgTime >= 1000) {
     // 大于等于1秒，显示秒
-    return { text: `${(avgTime / 1000).toFixed(3)} s`, unit: 's' };
+    return { text: `${(avgTime / 1000).toFixed(3)}`, unit: 's' };
   } else if (avgTime >= 1) {
     // 大于等于1毫秒，显示毫秒
-    return { text: `${avgTime.toFixed(3)} ms`, unit: 'ms' };
+    return { text: `${avgTime.toFixed(3)}`, unit: 'ms' };
   } else if (avgTime >= 0.001) {
     // 大于等于1微秒，显示微秒
-    return { text: `${(avgTime * 1000).toFixed(3)} μs`, unit: 'μs' };
+    return { text: `${(avgTime * 1000).toFixed(3)}`, unit: 'μs' };
   } else {
     // 小于1微秒，显示纳秒
-    return { text: `${(avgTime * 1000000).toFixed(0)} ns`, unit: 'ns' };
+    return { text: `${(avgTime * 1000000).toFixed(0)}`, unit: 'ns' };
   }
 };
 
@@ -288,11 +288,33 @@ export const generateReport = () => {
         });
 
         // 计算平均时间
-        const runTime = res.config.RUN_TIME as number;
-        const { text: avgTimeText, unit: avgTimeUnit } = formatAverageTime(res.time, runTime);
+        const runTime = res.config.runTime;
+        const avg = formatAverageTime(res.time, runTime);
         const avgTimeCell = h({
           tag: 'td',
-          innerHTML: `<span class="avg-time" unit="${avgTimeUnit}">${avgTimeText}</span>`,
+          children: [
+            h({
+              tag: 'span',
+              attributes: {
+                className: 'avg-time',
+                unit: avg.unit,
+              },
+              children: [
+                h({
+                  tag: 'span',
+                  attributes: { className: '' },
+                  innerHTML: avg.text,
+                }),
+                h({
+                  tag: 'span',
+                  attributes: {
+                    className: 'avg-time-unit',
+                  },
+                  innerHTML: avg.unit,
+                }),
+              ],
+            }),
+          ],
         });
 
         const { bgColor, textColor } = getColor(ratio);
@@ -479,13 +501,31 @@ export const generateReport = () => {
         });
 
         // 计算平均时间
-        const runTime = config.RUN_TIME as number;
-        const { text: avgTimeText, unit: avgTimeUnit } = formatAverageTime(time, runTime);
+        const runTime = config.runTime;
+        const avg = formatAverageTime(time, runTime);
 
         const avgTimeSpan = h({
           tag: 'span',
-          attributes: { className: 'avg-time', unit: avgTimeUnit },
-          innerHTML: `<span class="avg-time-label">Avg:</span> ${avgTimeText}`,
+          attributes: { className: 'avg-time', unit: avg.unit },
+          children: [
+            h({
+              tag: 'span',
+              attributes: { className: 'avg-time-label' },
+              innerHTML: 'Avg',
+            }),
+            h({
+              tag: 'span',
+              attributes: { className: '' },
+              innerHTML: avg.text,
+            }),
+            h({
+              tag: 'span',
+              attributes: {
+                className: 'avg-time-unit',
+              },
+              innerHTML: avg.unit,
+            }),
+          ],
         });
 
         suggestItems.push(

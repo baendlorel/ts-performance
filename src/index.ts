@@ -6,7 +6,9 @@
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import chalk from 'chalk';
-import { generateReport, run } from './core';
+
+import { run } from './core';
+import { generateReport } from './report-generator';
 
 async function runAllTests() {
   console.time('✅ All tests completed successfully!');

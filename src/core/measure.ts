@@ -10,7 +10,7 @@ interface BaseConfig {
   dataReusable: boolean;
 }
 
-interface FullConfig extends BaseConfig {
+export interface FullConfig extends BaseConfig {
   createData: (config: Partial<Config>) => unknown;
 
   // allow other properties
