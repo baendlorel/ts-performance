@@ -8,7 +8,7 @@ import { join } from 'node:path';
 import chalk from 'chalk';
 
 import { run } from './core';
-import { generateReport } from './report-generator';
+import { generateReport } from './report';
 
 async function runAllTests() {
   console.time('✅ All tests completed successfully!');
