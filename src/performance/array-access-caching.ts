@@ -15,11 +15,14 @@ import { measure } from '@/core';
  * - cached: 7.768ms
  */
 measure.test('Array Access', () => {
-  const ARRAY_SIZE = 100000;
-  const arr = Array.from({ length: ARRAY_SIZE }, (_, i) => i);
-  measure.addConfig({ ARRAY_SIZE });
+  measure.addConfig({
+    ARRAY_SIZE: 100000,
+    ARRAY_CREATOR: (size) => {
+      return Array.from({ length: size }, (_, i) => i);
+    },
+  });
 
-  measure.add('const a = arr[i]', () => {
+  measure.add('const a = arr[i]', (config, arr: number[]) => {
     let s = 0;
     for (let i = 0; i < arr.length; i++) {
       const a = arr[i];
@@ -27,7 +30,7 @@ measure.test('Array Access', () => {
     }
   });
 
-  measure.add('arr[i]', () => {
+  measure.add('arr[i]', (config, arr: number[]) => {
     let sum1 = 0;
     for (let i = 0; i < arr.length; i++) {
       sum1 += arr[i] * 2;

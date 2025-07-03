@@ -22,24 +22,36 @@ import { measure } from '@/core';
  * - for push: 55.54 ms
  */
 measure.test('Array Copy', () => {
-  const RUN_TIME = 1000;
-  const ARRAY_SIZE = 10000;
-  const arr = Array(ARRAY_SIZE).fill(1);
+  measure.addConfig({
+    RUN_TIME: 1000,
+    ARRAY_SIZE: 10000,
+    ARRAY_CREATOR: (size) => {
+      const a = new Array(size);
+      a.fill(0);
+      return a;
+    },
+  });
 
-  measure.addConfig({ RUN_TIME, ARRAY_SIZE });
-
-  measure.add('slice()', () => arr.slice());
-  measure.add('[...old]', () => [...arr]);
-  measure.add('concat()', () => arr.concat());
-  measure.add('Array.from()', () => Array.from(arr));
-  measure.add('for a[i] = old[i]', () => {
+  measure.add('slice()', (config, arr: number[]) => {
+    arr.slice();
+  });
+  measure.add('[...old]', (config, arr: number[]) => {
+    [...arr];
+  });
+  measure.add('concat()', (config, arr: number[]) => {
+    arr.concat();
+  });
+  measure.add('Array.from()', (config, arr: number[]) => {
+    Array.from(arr);
+  });
+  measure.add('for a[i] = old[i]', (config, arr: number[]) => {
     const a = [] as any[];
     for (let i = 0; i < arr.length; i++) {
       a[i] = arr[i];
     }
     return a;
   });
-  measure.add('for a.push(old[i])', () => {
+  measure.add('for a.push(old[i])', (config, arr: number[]) => {
     const a = [] as any[];
     for (let i = 0; i < arr.length; i++) {
       a.push(arr[i]);

@@ -3,11 +3,27 @@ import { ReflectDeep } from 'reflect-deep';
 import { results } from './result';
 
 const CONFIG_LABEL = Symbol('config-label');
-type Config = Record<string, number | string> & {
+interface Config<T extends any[] = any[]> {
   RUN_TIME: number;
   ARRAY_SIZE: number;
+  ARRAY_CREATOR: (size: number) => T;
+  OTHER: Record<string, any>; // other configs
   [CONFIG_LABEL]: string;
-};
+}
+
+interface Task {
+  configs: Config[];
+  taskFn: Function;
+  focused: boolean;
+  extra: boolean;
+
+  // keys
+  testName: string;
+  // configAsLabel: string;  // & now load from Config[symbol]
+  label: string;
+}
+
+type TaskFn = (config: Config, arr: any[]) => void;
 
 const formatNum = (n: any | number) => {
   if (typeof n !== 'number') {
@@ -16,19 +32,6 @@ const formatNum = (n: any | number) => {
   const s = n.toString();
   return s.length > 5 ? `1e${s.length - 1}` : s;
 };
-
-type Task = {
-  configs: Config[];
-  fn: Function;
-  focused: boolean;
-  extra: boolean;
-
-  // keys
-  testName: string;
-  // configAsLabel: string;  // & now load from Config[symbol]
-  label: string;
-};
-
 class Measure {
   private static readonly tasks: Task[] = [];
   private static noFocusedTask = true;
@@ -46,13 +49,23 @@ class Measure {
         console.time(timeLabel);
 
         for (const config of t.configs) {
+          const arr = config.ARRAY_CREATOR(config.ARRAY_SIZE);
+          const createAgain =
+            arr.length !== 0 &&
+            arr.some((a) => (typeof a === 'object' && a !== null) || typeof a === 'function');
+
+          let arrayCreationTime = 0;
           const start = performance.now();
           for (let i = 1; i <= config.RUN_TIME; i++) {
-            t.fn(config);
+            const copyArrStart = performance.now();
+            const newArr = createAgain ? config.ARRAY_CREATOR(config.ARRAY_SIZE) : arr.slice();
+            const copyArrEnd = performance.now();
+            t.taskFn(config, newArr);
+            arrayCreationTime += copyArrEnd - copyArrStart;
           }
           const end = performance.now();
           ReflectDeep.set(results, [t.testName, config[CONFIG_LABEL], t.label], {
-            time: end - start,
+            time: end - start - arrayCreationTime,
             extra: t.extra,
             config: { ...config },
           });
@@ -62,15 +75,10 @@ class Measure {
     }
   }
 
-  private addTask(opts: {
-    label: string;
-    extra: boolean;
-    focus: boolean;
-    fn: (config: Config) => void;
-  }) {
+  private addTask(opts: { label: string; extra: boolean; focus: boolean; taskFn: TaskFn }) {
     this.tasks.push({
       configs: this.configs,
-      fn: opts.fn,
+      taskFn: opts.taskFn,
       focused: opts.focus,
       extra: opts.extra,
       testName: this.testName,
@@ -78,13 +86,13 @@ class Measure {
     });
   }
 
-  private prepare(opts: { testName: string; fn: () => void; focus: boolean }) {
+  private prepare(opts: { testName: string; blockFn: () => void; focus: boolean }) {
     this.testName = opts.testName;
 
     // clear previous datas
     this.tasks = [];
     this.configs = [];
-    opts.fn();
+    opts.blockFn();
     if (opts.focus) {
       Measure.noFocusedTask = false;
       this.tasks.forEach((t) => (t.focused = true));
@@ -92,38 +100,64 @@ class Measure {
     Measure.tasks.push(...this.tasks);
   }
 
-  test(testName: string, fn: () => void) {
-    this.prepare({ testName, fn, focus: false });
+  test(testName: string, blockFn: () => void) {
+    this.prepare({ testName, blockFn, focus: false });
   }
 
-  ftest(testName: string, fn: () => void) {
-    this.prepare({ testName, fn, focus: true });
+  ftest(testName: string, blockFn: () => void) {
+    this.prepare({ testName, blockFn, focus: true });
   }
 
-  addConfig(config: Partial<Config>) {
-    const newConfig = Object.assign({ RUN_TIME: 1, ARRAY_SIZE: 0 }, config) as Config;
-    const label: string[] = [
-      `${chalk.blueBright('RUN_TIME')}: ${chalk.cyanBright(formatNum(newConfig.RUN_TIME))}`,
-    ];
-    for (const k in newConfig) {
-      if (k === 'RUN_TIME') {
-        continue;
-      }
-      if (k === 'ARRAY_SIZE' && newConfig.ARRAY_SIZE === 0) {
-        continue; // skip if ARRAY_SIZE is not set
-      }
-      label.push(`${k}: ${chalk.cyanBright(formatNum(newConfig[k]))}`);
+  addConfig(newConfig: Partial<Config>) {
+    const {
+      RUN_TIME = 1,
+      ARRAY_SIZE = 0,
+      ARRAY_CREATOR = () => [],
+      OTHER = {},
+    } = Object(newConfig) as Config;
+
+    // # expects
+    if (!Number.isSafeInteger(RUN_TIME) || RUN_TIME <= 0) {
+      throw new Error('RUN_TIME must be a positive number');
     }
-    newConfig[CONFIG_LABEL] = label.join(', ');
-    this.configs.push(newConfig);
+    if (!Number.isSafeInteger(ARRAY_SIZE) || ARRAY_SIZE < 0) {
+      throw new Error('ARRAY_SIZE must be a non-negative integer');
+    }
+    if (typeof ARRAY_CREATOR !== 'function') {
+      throw new Error('ARRAY_CREATOR must be a function or omitted');
+    }
+    if (typeof OTHER !== 'object') {
+      throw new Error('ARRAY_CREATOR must be a function or omitted');
+    }
+
+    // # adding
+    const label: string[] = [
+      `${chalk.blueBright('RUN_TIME')}: ${chalk.cyanBright(formatNum(RUN_TIME))}`,
+    ];
+    if (ARRAY_SIZE > 0) {
+      label.push(`${chalk.blueBright('ARRAY_SIZE')}: ${chalk.cyanBright(formatNum(ARRAY_SIZE))}`);
+    }
+
+    for (const k in OTHER) {
+      const v = typeof OTHER[k] === 'number' ? formatNum(OTHER[k]) : OTHER[k];
+      label.push(`${k}: ${chalk.cyanBright(v)}`);
+    }
+
+    this.configs.push({
+      RUN_TIME,
+      ARRAY_SIZE,
+      ARRAY_CREATOR,
+      OTHER,
+      [CONFIG_LABEL]: label.join(', '),
+    });
   }
 
-  add(label: string, fn: (config: Config) => void) {
-    this.addTask({ label, extra: false, focus: false, fn });
+  add(label: string, taskFn: TaskFn) {
+    this.addTask({ label, extra: false, focus: false, taskFn });
   }
 
-  extra(label: string, fn: (config: Config) => void) {
-    this.addTask({ label, extra: true, focus: false, fn });
+  extra(label: string, taskFn: TaskFn) {
+    this.addTask({ label, extra: true, focus: false, taskFn });
   }
 }
 

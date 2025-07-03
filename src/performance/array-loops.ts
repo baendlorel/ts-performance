@@ -28,29 +28,32 @@ import { measure } from '@/core';
  * - Array.from + forEach: 50.18ms
  */
 measure.test('Array Loops', () => {
-  const ARRAY_SIZE = 10_000_000;
-  const arr = Array.from({ length: ARRAY_SIZE }, (_, i) => i);
-  measure.addConfig({ ARRAY_SIZE });
+  measure.addConfig({
+    ARRAY_SIZE: 10_000_000,
+    ARRAY_CREATOR: (size) => {
+      return Array.from({ length: size }, (_, i) => i);
+    },
+  });
 
-  measure.add('for classic', () => {
+  measure.add('for classic', (config, arr: number[]) => {
     for (let i = 0; i < arr.length; i++) {
       const x = arr[i] * 2;
     }
   });
 
-  measure.add('for...of', () => {
+  measure.add('for...of', (config, arr: number[]) => {
     for (const val of arr) {
       const x = val * 2;
     }
   });
 
-  measure.add('for...in', () => {
+  measure.add('for...in', (config, arr: number[]) => {
     for (const key in arr) {
       const x = arr[key] * 2;
     }
   });
 
-  measure.add('while', () => {
+  measure.add('while', (config, arr: number[]) => {
     let i = 0;
     while (i < arr.length) {
       const x = arr[i] * 2;
@@ -58,7 +61,7 @@ measure.test('Array Loops', () => {
     }
   });
 
-  measure.add('do...while', () => {
+  measure.add('do...while', (config, arr: number[]) => {
     let i = 0;
     do {
       const x = arr[i] * 2;
@@ -66,17 +69,17 @@ measure.test('Array Loops', () => {
     } while (i < arr.length);
   });
 
-  measure.add('forEach', () => {
+  measure.add('forEach', (config, arr: number[]) => {
     arr.forEach((val) => {
       const x = val * 2;
     });
   });
 
-  measure.add('map', () => {
+  measure.add('map', (config, arr: number[]) => {
     arr.map((val) => val * 2);
   });
 
-  measure.add('reduce', () => {
+  measure.add('reduce', (config, arr: number[]) => {
     arr.reduce((acc, val) => acc + val * 2, 0);
   });
 });

@@ -35,14 +35,14 @@ measure.test('Object Shallow Copy', () => {
   };
 
   const RUN_TIME = 1;
-  const FIELD_COUNT = 100000;
+  const OBJ_SIZE = 100000;
   const FILED_LEN = 200;
 
-  measure.addConfig({ RUN_TIME, FIELD_COUNT, FILED_LEN });
+  measure.addConfig({ RUN_TIME, OTHER: { OBJ_SIZE, FILED_LEN } });
 
   const o = {} as any;
 
-  for (let j = 0; j < FIELD_COUNT; j++) {
+  for (let j = 0; j < OBJ_SIZE; j++) {
     o[randStr(FILED_LEN)] = Math.random();
   }
 
@@ -58,15 +58,12 @@ measure.test('Object Shallow Copy', () => {
     }
   });
 
-  const g = Reflect.get;
-  const s = Reflect.set;
-  const ok = Reflect.ownKeys;
   measure.add('Reflect.get/set/ownKeys', () => {
     for (let i = 0; i < o.length; i++) {
-      const keys = ok(o[i]);
+      const keys = Reflect.ownKeys(o[i]);
       const a = {};
       for (let j = 0; j < keys.length; j++) {
-        s(a, keys[j], g(o[i], keys[j]));
+        Reflect.set(a, keys[j], Reflect.get(o[i], keys[j]));
       }
     }
   });
