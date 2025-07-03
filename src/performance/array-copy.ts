@@ -22,15 +22,13 @@ import { measure } from '@/core';
  * - for push: 55.54 ms
  */
 measure.test('Array Copy', () => {
-  measure.addConfig({
-    RUN_TIME: 1000,
-    ARRAY_SIZE: 10000,
-    ARRAY_CREATOR: (size) => {
-      const a = new Array(size);
-      a.fill(0);
-      return a;
+  measure.addConfig(
+    {
+      runTime: 1000,
+      size: 10000,
     },
-  });
+    (config) => Array.from({ length: config.size }, (_, i) => i)
+  );
 
   measure.add('slice()', (config, arr: number[]) => {
     arr.slice();

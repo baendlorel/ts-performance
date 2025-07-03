@@ -19,21 +19,20 @@ import { measure } from '@/core';
  * - Reflect.has: 25.5ms
  */
 measure.test('Property detection', () => {
-  const RUN_TIME = 1e8;
-  const OBJ_SIZE = 10;
-  measure.addConfig({ RUN_TIME, OTHER: { OBJ_SIZE } });
-
-  const obj = { a: 1, b: 2, c: 3 } as any;
-  for (let i = 0; i < OBJ_SIZE; i++) {
-    obj['k' + i] = i;
-  }
-
-  measure.add('in', () => {
-    'a' in obj;
+  measure.addConfig({ runTime: 1e8, size: 10 }, (config) => {
+    const o = { a: 1, b: 2, c: 3 } as any;
+    for (let i = 0; i < config.size; i++) {
+      o['k' + i] = i;
+    }
+    return o;
   });
 
-  measure.add('Reflect.has', () => {
-    Reflect.has(obj, 'a');
+  measure.add('in', (config, o) => {
+    'a' in o;
+  });
+
+  measure.add('Reflect.has', (config, o) => {
+    Reflect.has(o, 'a');
   });
 });
 

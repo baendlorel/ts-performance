@@ -28,12 +28,14 @@ import { measure } from '@/core';
  * - Array.from + forEach: 50.18ms
  */
 measure.test('Array Loops', () => {
-  measure.addConfig({
-    ARRAY_SIZE: 10_000_000,
-    ARRAY_CREATOR: (size) => {
-      return Array.from({ length: size }, (_, i) => i);
+  measure.addConfig(
+    {
+      size: 10_000_000,
     },
-  });
+    (config) => {
+      return Array.from({ length: config.size }, (_, i) => i);
+    }
+  );
 
   measure.add('for classic', (config, arr: number[]) => {
     for (let i = 0; i < arr.length; i++) {

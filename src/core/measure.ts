@@ -3,16 +3,30 @@ import { ReflectDeep } from 'reflect-deep';
 import { results } from './result';
 
 const CONFIG_LABEL = Symbol('config-label');
-interface Config<T extends any[] = any[]> {
-  RUN_TIME: number;
-  ARRAY_SIZE: number;
-  ARRAY_CREATOR: (size: number) => T;
-  OTHER: Record<string, any>; // other configs
+
+interface BaseConfig {
+  runTime: number;
+  size: number;
+  dataReusable: boolean;
+}
+
+interface FullConfig extends BaseConfig {
+  createData: (config: Partial<Config>) => unknown;
+
+  // allow other properties
+  [key: string]: any;
+
+  // internal
   [CONFIG_LABEL]: string;
 }
 
+interface Config extends BaseConfig {
+  // allow other properties
+  [key: string]: any;
+}
+
 interface Task {
-  configs: Config[];
+  configs: FullConfig[];
   taskFn: Function;
   focused: boolean;
   extra: boolean;
@@ -23,7 +37,7 @@ interface Task {
   label: string;
 }
 
-type TaskFn = (config: Config, arr: any[]) => void;
+type TaskFn = (config: FullConfig, data: any) => void;
 
 const formatNum = (n: any | number) => {
   if (typeof n !== 'number') {
@@ -32,12 +46,20 @@ const formatNum = (n: any | number) => {
   const s = n.toString();
   return s.length > 5 ? `1e${s.length - 1}` : s;
 };
+
+const toUpperSnake = (name: string) => {
+  if (/^[A-Z_]+$/g.test(name)) {
+    return name;
+  }
+  return name.replace(/([A-Z])/g, '_$1').toUpperCase();
+};
+
 class Measure {
   private static readonly tasks: Task[] = [];
   private static noFocusedTask = true;
 
   private testName: string = '';
-  private configs: Config[] = [];
+  private configs: FullConfig[] = [];
   private tasks: Task[] = [];
 
   static run() {
@@ -49,19 +71,17 @@ class Measure {
         console.time(timeLabel);
 
         for (const config of t.configs) {
-          const arr = config.ARRAY_CREATOR(config.ARRAY_SIZE);
-          const createAgain =
-            arr.length !== 0 &&
-            arr.some((a) => (typeof a === 'object' && a !== null) || typeof a === 'function');
+          const data = config.createData(config);
+          const copy = config.dataReusable ? () => data : () => config.createData(config);
 
           let arrayCreationTime = 0;
           const start = performance.now();
-          for (let i = 1; i <= config.RUN_TIME; i++) {
-            const copyArrStart = performance.now();
-            const newArr = createAgain ? config.ARRAY_CREATOR(config.ARRAY_SIZE) : arr.slice();
-            const copyArrEnd = performance.now();
-            t.taskFn(config, newArr);
-            arrayCreationTime += copyArrEnd - copyArrStart;
+          for (let i = 1; i <= config.runTime; i++) {
+            const copyStart = performance.now();
+            const newData = copy();
+            const copyEnd = performance.now();
+            t.taskFn(config, newData);
+            arrayCreationTime += copyEnd - copyStart;
           }
           const end = performance.now();
           ReflectDeep.set(results, [t.testName, config[CONFIG_LABEL], t.label], {
@@ -108,46 +128,45 @@ class Measure {
     this.prepare({ testName, blockFn, focus: true });
   }
 
-  addConfig(newConfig: Partial<Config>) {
-    const {
-      RUN_TIME = 1,
-      ARRAY_SIZE = 0,
-      ARRAY_CREATOR = () => [],
-      OTHER = {},
-    } = Object(newConfig) as Config;
+  addConfig<T extends Partial<Config>>(newConfig: T, dataCreator?: (config: T) => unknown) {
+    const { runTime = 1, size = 0, dataReusable = true } = Object(newConfig) as Config;
+    dataCreator = dataCreator ?? ((config: T) => {});
 
     // # expects
-    if (!Number.isSafeInteger(RUN_TIME) || RUN_TIME <= 0) {
+    if (!Number.isSafeInteger(runTime) || runTime <= 0) {
       throw new Error('RUN_TIME must be a positive number');
     }
-    if (!Number.isSafeInteger(ARRAY_SIZE) || ARRAY_SIZE < 0) {
-      throw new Error('ARRAY_SIZE must be a non-negative integer');
+    if (typeof dataCreator !== 'function') {
+      throw new Error('DATA_CREATOR must be a function or omitted');
     }
-    if (typeof ARRAY_CREATOR !== 'function') {
-      throw new Error('ARRAY_CREATOR must be a function or omitted');
-    }
-    if (typeof OTHER !== 'object') {
-      throw new Error('ARRAY_CREATOR must be a function or omitted');
+    if (typeof size !== 'number' || !Number.isSafeInteger(size) || size < 0) {
+      throw new Error('ARRAY_SIZE must be a non-negative integer or omitted');
     }
 
     // # adding
     const label: string[] = [
-      `${chalk.blueBright('RUN_TIME')}: ${chalk.cyanBright(formatNum(RUN_TIME))}`,
+      `${chalk.blueBright('RUN_TIME')}: ${chalk.cyanBright(formatNum(runTime))}`,
     ];
-    if (ARRAY_SIZE > 0) {
-      label.push(`${chalk.blueBright('ARRAY_SIZE')}: ${chalk.cyanBright(formatNum(ARRAY_SIZE))}`);
-    }
 
-    for (const k in OTHER) {
-      const v = typeof OTHER[k] === 'number' ? formatNum(OTHER[k]) : OTHER[k];
-      label.push(`${k}: ${chalk.cyanBright(v)}`);
+    const exclude: (keyof BaseConfig)[] = ['runTime', 'dataReusable'];
+    const SIZE: keyof BaseConfig = 'size';
+    for (const k in newConfig) {
+      if (exclude.includes(k as keyof BaseConfig)) {
+        continue;
+      }
+      if (k === SIZE) {
+        label.push(`${toUpperSnake(SIZE)}: ${chalk.cyanBright(formatNum(newConfig.size))}`);
+        continue;
+      }
+      const v = typeof newConfig[k] === 'number' ? formatNum(newConfig[k]) : newConfig[k];
+      label.push(`${toUpperSnake(k)}: ${chalk.cyanBright(v)}`);
     }
 
     this.configs.push({
-      RUN_TIME,
-      ARRAY_SIZE,
-      ARRAY_CREATOR,
-      OTHER,
+      runTime,
+      size,
+      dataReusable,
+      createData: dataCreator as (config: Partial<Config>) => unknown,
       [CONFIG_LABEL]: label.join(', '),
     });
   }

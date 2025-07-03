@@ -17,29 +17,31 @@ import { measure } from '@/core';
  * - reflect: 330.358ms (不明原因比10个属性还要快)
  */
 measure.test('Property Access', () => {
-  const RUN_TIME = 1e6;
-  const OBJ_SIZE = 1000;
-  measure.addConfig({ RUN_TIME, OBJ_SIZE });
-
-  const obj = { a: 1, b: 2, c: 3 } as any;
-  for (let i = 0; i < OBJ_SIZE; i++) {
-    obj['k' + i] = i;
-  }
+  measure.addConfig({ size: 1000, ACCESS_TIME: 1e6 }, (config) => {
+    const o = { a: 1, b: 2, c: 3 } as any;
+    for (let i = 0; i < config.size; i++) {
+      o['k' + i] = i;
+    }
+    return o;
+  });
 
   const key = 'b';
-  let sum = 0;
-
-  measure.add('obj[key]', () => {
-    sum += obj[key];
+  measure.add('obj[key]', (config, o) => {
+    for (let i = 0; i < config.ACCESS_TIME; i++) {
+      const a = o[key];
+    }
   });
 
-  measure.add('obj.key', () => {
-    sum += obj.b;
+  measure.add('obj.key', (config, o) => {
+    for (let i = 0; i < config.ACCESS_TIME; i++) {
+      const a = o.b;
+    }
   });
 
-  sum = 0;
-  measure.add('Reflect.get(obj, key)', () => {
-    sum += Reflect.get(obj, key);
+  measure.add('Reflect.get(obj, key)', (config, o) => {
+    for (let i = 0; i < config.ACCESS_TIME; i++) {
+      const a = Reflect.get(o, key);
+    }
   });
 });
 

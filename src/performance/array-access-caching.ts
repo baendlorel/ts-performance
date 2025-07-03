@@ -15,12 +15,12 @@ import { measure } from '@/core';
  * - cached: 7.768ms
  */
 measure.test('Array Access', () => {
-  measure.addConfig({
-    ARRAY_SIZE: 100000,
-    ARRAY_CREATOR: (size) => {
-      return Array.from({ length: size }, (_, i) => i);
+  measure.addConfig(
+    {
+      size: 100000,
     },
-  });
+    (config) => Array.from({ length: config.size }, (_, i) => i)
+  );
 
   measure.add('const a = arr[i]', (config, arr: number[]) => {
     let s = 0;
