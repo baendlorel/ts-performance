@@ -1,21 +1,41 @@
 import { measure } from '@/core';
 
-measure.test('Modulo', () => {
-  measure.addConfig({ runTime: 1e8, a: 9, base: 10 });
-  measure.addConfig({ runTime: 1e6, a: 756, base: 1652 });
+measure.ftest('Modulo positive', () => {
+  measure.addConfig({ runTime: 1e6, a: 9, base: 10, '': 'assume value is 0~2*base-1' });
+  measure.addConfig({ runTime: 1e4, a: 756, base: 1652, '': 'assume value is 0~2*base-1' });
 
   measure.add('no if', (config) => {
-    const q = config.a % config.base;
-    const r = Math.floor(config.a / config.base);
+    const value = config.a % config.base;
+    const carry = Math.floor(config.a / config.base);
   });
 
   measure.add('if < base', (config) => {
     if (config.a < config.base) {
-      const q = 0;
-      const r = config.a;
+      const value = 0;
+      const carry = config.a;
     } else {
-      const q = config.a % config.base;
-      const r = Math.floor(config.a / config.base);
+      const value = config.a - config.base;
+      const carry = 1;
+    }
+  });
+});
+
+measure.ftest('Modulo negative', () => {
+  measure.addConfig({ runTime: 1e6, a: -9, base: 10, '': 'assume value is (-1~1)*base' });
+  measure.addConfig({ runTime: 1e4, a: -756, base: 1652, '': 'assume value is (-1~1)*base' });
+
+  measure.add('no if', (config) => {
+    const value = ((config.a % config.base) + config.base) % config.base;
+    const carry = Math.floor(config.a / config.base);
+  });
+
+  measure.add('if < base', (config) => {
+    if (config.a < 0) {
+      const value = config.a + config.base;
+      const carry = -1;
+    } else {
+      const value = config.a;
+      const carry = 0;
     }
   });
 });
