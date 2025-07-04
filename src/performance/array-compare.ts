@@ -1,6 +1,6 @@
 import { measure } from '@/core';
 
-measure.ftest('Array Equal', () => {
+measure.test('Array Compare', () => {
   const creator = (config: any) => ({
     a: Array.from({ length: config.size }, (_, i) => i),
     b: Array.from({ length: config.size }, (_, i) => i),
