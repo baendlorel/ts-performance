@@ -1,6 +1,6 @@
 import { measure } from '@/core';
 
-measure.ftest('Modulo positive', () => {
+measure.test('Modulo positive', () => {
   measure.addConfig({ runTime: 1e6, a: 9, base: 10, '': 'assume value is 0~2*base-1' });
   measure.addConfig({ runTime: 1e4, a: 756, base: 1652, '': 'assume value is 0~2*base-1' });
 
@@ -20,7 +20,7 @@ measure.ftest('Modulo positive', () => {
   });
 });
 
-measure.ftest('Modulo negative', () => {
+measure.test('Modulo negative', () => {
   measure.addConfig({ runTime: 1e7, a: -9, base: 10, '': 'assume value is (-1~1)*(base-1)' });
   measure.addConfig({ runTime: 1e6, a: -756, base: 1652, '': 'assume value is (-1~1)*(base-1)' });
 
@@ -37,6 +37,27 @@ measure.ftest('Modulo negative', () => {
       const value = config.a;
       const carry = 0;
     }
+  });
+});
+
+measure.ftest('Modulo sub+mul⭕mod', () => {
+  const r = () => Math.ceil(Math.random() * 1e6);
+  measure.addConfig({ runTime: 1e7 }, (config) => {
+    // calculate  a / b
+    return {
+      a: r(),
+      b: r(),
+    };
+  });
+
+  measure.add('mod', (config) => {
+    const carry = Math.floor(config.a / config.b);
+    const value = config.a % config.b;
+  });
+
+  measure.add('sub+mul', (config) => {
+    const carry = Math.floor(config.a / config.b);
+    const value = config.a - carry * config.b;
   });
 });
 
