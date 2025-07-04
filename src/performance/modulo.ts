@@ -40,7 +40,7 @@ measure.test('Modulo negative', () => {
   });
 });
 
-measure.ftest('Modulo sub+mul⭕mod', () => {
+measure.test('Modulo sub+mul⭕mod', () => {
   const r = () => Math.ceil(Math.random() * 1e6);
   measure.addConfig({ runTime: 1e7 }, (config) => {
     // calculate  a / b
