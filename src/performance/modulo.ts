@@ -21,8 +21,8 @@ measure.ftest('Modulo positive', () => {
 });
 
 measure.ftest('Modulo negative', () => {
-  measure.addConfig({ runTime: 1e6, a: -9, base: 10, '': 'assume value is (-1~1)*base' });
-  measure.addConfig({ runTime: 1e4, a: -756, base: 1652, '': 'assume value is (-1~1)*base' });
+  measure.addConfig({ runTime: 1e7, a: -9, base: 10, '': 'assume value is (-1~1)*(base-1)' });
+  measure.addConfig({ runTime: 1e6, a: -756, base: 1652, '': 'assume value is (-1~1)*(base-1)' });
 
   measure.add('no if', (config) => {
     const value = ((config.a % config.base) + config.base) % config.base;
