@@ -60,5 +60,3 @@ measure.test('Modulo sub+mul⭕mod', () => {
     const value = config.a - carry * config.b;
   });
 });
-
-export {};

@@ -36,5 +36,3 @@ measure.test('Array Compare', () => {
     return a.every((ai: number, i: number) => b[i] === ai);
   });
 });
-
-export {};

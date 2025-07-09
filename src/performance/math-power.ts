@@ -15,5 +15,3 @@ measure.test('a^b', () => {
     return data.a ** data.b;
   });
 });
-
-export {};

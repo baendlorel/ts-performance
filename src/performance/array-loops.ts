@@ -85,5 +85,3 @@ measure.test('Array Loops', () => {
     arr.reduce((acc, val) => acc + val * 2, 0);
   });
 });
-
-export {};

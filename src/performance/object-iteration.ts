@@ -82,5 +82,3 @@ measure.test('Object Iteration', () => {
     });
   });
 });
-
-export {};

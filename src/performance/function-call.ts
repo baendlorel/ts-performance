@@ -25,5 +25,3 @@ measure.test('Function Call', () => {
     Reflect.apply(test, null, [1, 2]);
   });
 });
-
-export {};

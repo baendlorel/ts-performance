@@ -37,5 +37,3 @@ measure.test('Array Access', () => {
     }
   });
 });
-
-export {};

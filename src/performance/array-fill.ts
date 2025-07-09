@@ -17,5 +17,3 @@ measure.test('Array Fill', () => {
     arr2.push(...a);
   });
 });
-
-export {};

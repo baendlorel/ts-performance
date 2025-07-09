@@ -35,5 +35,3 @@ measure.test('Property detection', () => {
     Reflect.has(o, 'a');
   });
 });
-
-export {};

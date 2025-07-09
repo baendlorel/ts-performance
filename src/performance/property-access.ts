@@ -44,5 +44,3 @@ measure.test('Property Access', () => {
     }
   });
 });
-
-export {};

@@ -30,5 +30,3 @@ measure.test('Log(n,x)', () => {
     }
   });
 });
-
-export {};

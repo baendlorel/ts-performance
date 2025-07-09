@@ -57,5 +57,3 @@ measure.test('Array Copy', () => {
     return a;
   });
 });
-
-export {};

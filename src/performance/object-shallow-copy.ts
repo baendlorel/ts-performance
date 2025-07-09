@@ -64,5 +64,3 @@ measure.test('Object Shallow Copy', () => {
     }
   });
 });
-
-export {};

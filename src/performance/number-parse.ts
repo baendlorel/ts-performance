@@ -26,5 +26,3 @@ measure.test('Number Parse', () => {
     return +data;
   });
 });
-
-export {};
