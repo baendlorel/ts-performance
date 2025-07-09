@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, writeFileSync } from 'fs';
+import { readdirSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import { join, relative } from 'path';
 import chalk from 'chalk';
 
@@ -109,8 +109,16 @@ const formatDT = (date = new Date()) => {
 
 const outputToHTML = (html: string, reportId: number) => {
   const dtm = formatDTForFilename();
-  const outputPath = join(process.cwd(), 'reports', `id_${reportId}__${dtm}.html`);
+  const newName = `id_${reportId}__${dtm}.html`;
+
+  const reportDir = join(process.cwd(), 'reports');
+  const outputPath = join(reportDir, newName);
   writeFileSync(outputPath, html, 'utf8');
+  readdirSync(join(process.cwd(), 'reports')).forEach((file) => {
+    if (file !== newName && file !== 'old') {
+      renameSync(join(reportDir, file), join(reportDir, 'old', file));
+    }
+  });
   console.log(
     chalk.yellowBright(`HTML Report Generated`),
     chalk.green(relative(process.cwd(), outputPath))

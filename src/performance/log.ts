@@ -1,6 +1,6 @@
 import { measure } from '@/core';
 
-measure.ftest('Log(n,x)', () => {
+measure.test('Log(n,x)', () => {
   const numbers = Array.from({ length: 10 }, (_, i) => i + 35464231);
   measure.addConfig({ runTime: 2e6 });
   measure.addConfig({ runTime: 2e6 });
