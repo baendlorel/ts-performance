@@ -1,5 +1,6 @@
-import { readdirSync, readFileSync, renameSync, writeFileSync } from 'fs';
-import { join, relative } from 'path';
+import { exec } from 'node:child_process';
+import { readdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
+import { join, relative } from 'node:path';
 import chalk from 'chalk';
 
 import { results, suggests } from '@/core/result';
@@ -123,6 +124,7 @@ const outputToHTML = (html: string, reportId: number) => {
     chalk.yellowBright(`HTML Report Generated`),
     chalk.green(relative(process.cwd(), outputPath))
   );
+  exec(`explorer.exe "$(wslpath -w ${outputPath})"`);
 };
 
 // 生成HTML页面

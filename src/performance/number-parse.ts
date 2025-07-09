@@ -1,6 +1,6 @@
 import { measure } from '@/core';
 
-measure.ftest('Number Parse', () => {
+measure.test('Number Parse', () => {
   const creator = () => (100 * Math.random()).toString();
   measure.addConfig({ runTime: 1e1 }, creator);
   measure.addConfig({ runTime: 2e1 }, creator);
