@@ -1,7 +1,9 @@
 import { measure } from '@/core';
 
 measure.ftest('Destruct Access', () => {
-  measure.addConfig({ runTime: 1e1 }, () => Array.from({ length: 4 }, (_, i) => i));
+  measure.addConfig({ runTime: 1e1, dataReusable: false }, () =>
+    Array.from({ length: 4 }, (_, i) => i)
+  );
   measure.addConfig({ runTime: 2e1 }, () => Array.from({ length: 4 }, (_, i) => i));
   measure.addConfig({ runTime: 3e1 }, () => Array.from({ length: 4 }, (_, i) => i));
   measure.addConfig({ runTime: 1e3 }, () => Array.from({ length: 4 }, (_, i) => i));
