@@ -15,7 +15,7 @@ function fastExpBigInt(a: bigint, exponent: bigint) {
   return result;
 }
 
-measure.ftest('a^b', () => {
+measure.test('BigInt power', () => {
   const r = (digit: number) => BigInt(Math.random().toFixed(digit).replace('0.', ''));
   measure.addConfig({ runTime: 3e1, digit: 3 }, (config) => ({
     a: r(config.digit),
@@ -38,5 +38,3 @@ measure.ftest('a^b', () => {
     return data.a ** data.b;
   });
 });
-
-export {};

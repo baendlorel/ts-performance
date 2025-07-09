@@ -22,6 +22,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "bignumber.js": "^9.3.0",
     "chalk": "^5.4.1",
     "reflect-deep": "^1.0.0"
   }
