@@ -1,6 +1,6 @@
 import { measure } from '@/core';
 
-measure.ftest('Destruct Access', () => {
+measure.test('Destruct Access', () => {
   measure.addConfig({ runTime: 1e1, dataReusable: false }, () =>
     Array.from({ length: 4 }, (_, i) => i)
   );
