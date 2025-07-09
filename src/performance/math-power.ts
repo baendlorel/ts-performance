@@ -4,8 +4,6 @@ measure.test('a^b', () => {
   measure.addConfig({ runTime: 1e1 }, () => ({ a: Math.random(), b: Math.random() }));
   measure.addConfig({ runTime: 1e2 }, () => ({ a: Math.random(), b: Math.random() }));
   measure.addConfig({ runTime: 1e3 }, () => ({ a: Math.random(), b: Math.random() }));
-  measure.addConfig({ runTime: 1e4 }, () => ({ a: Math.random(), b: Math.random() }));
-  measure.addConfig({ runTime: 5e4 }, () => ({ a: Math.random(), b: Math.random() }));
   measure.addConfig({ runTime: 1e5 }, () => ({ a: Math.random(), b: Math.random() }));
   measure.addConfig({ runTime: 1e7 }, () => ({ a: Math.random(), b: Math.random() }));
 
