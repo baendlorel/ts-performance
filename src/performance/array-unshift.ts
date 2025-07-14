@@ -1,6 +1,6 @@
 import { measure } from '@/core';
 
-measure.ftest('Array Unshift', () => {
+measure.test('Array Unshift', () => {
   const create = (config: { size: number }) => {
     return Array.from({ length: config.size }, (_, i) => i);
   };
