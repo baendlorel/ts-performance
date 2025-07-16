@@ -1,6 +1,6 @@
 import { measure } from '@/core';
 
-measure.ftest('Key Types', () => {
+measure.test('Key Types', () => {
   measure.addConfig({ runTime: 10 });
   measure.addConfig({ runTime: 1000 });
   measure.addConfig({ runTime: 1e7 });
